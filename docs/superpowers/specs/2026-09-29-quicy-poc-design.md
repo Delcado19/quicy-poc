@@ -34,8 +34,12 @@ shell.qml                 entry: one PanelWindow per screen (Variants)
 core/
   Theme.qml               singleton, FileView + JsonAdapter, defaults for every value
   ModuleHost.qml          resolves id -> Module.qml, Loader, error placeholder
-  Layout.qml              merges default + user layout, per-screen lookup
+  BarLayout.qml           merges default + user layout, per-screen lookup, IPC-loaded ids
+  Paths.qml               singleton: user/state/shared dirs, host API version
+  lib/*.js                pure logic (theme, layout, modules, script, battery, backlight), unit-tested with node
   Ipc.qml                 IpcHandler: module load|unload|refresh <id>, theme reload, layout reload
+                          (`load` appends the id to the right zone of every bar; `unload` hides an id, also one
+                          from the layout, until `layout reload`)
 services/                 singletons, stable interface over Quickshell types
   Battery.qml  Backlight.qml
 components/
@@ -60,10 +64,10 @@ Theme resolution: generated theme, then `themes/example.json`, then defaults in 
 ### Module contract
 
 - Folder `modules/<id>/` with `Module.qml` (an `Item` with `implicitWidth/Height`) and
-  `module.json`: `name`, `api` (required service API version), optional `requires`,
+  `module.json`: `name`, `api` (required service API version), optional `requires`, `options`,
   `type` (`bar` | `window`; only `bar` is built in the PoC, the field reserves the
   distinction for standalone widgets).
-- The host passes `moduleId`, `screen`, `config` (object from the layout). Theme and
+- The host passes `moduleId`, `screen` and `meta` (the parsed `module.json`; its optional `options` object carries per-module settings such as the script command). Theme and
   services are singletons (`qs.core`, `qs.services`). If the import test (below) fails for
   the user directory, they are passed as properties instead.
 - A module may bring its own files (relative imports inside its own folder), including its
@@ -83,6 +87,8 @@ Theme resolution: generated theme, then `themes/example.json`, then defaults in 
 - Explicit activation only: a module runs only if its id is in the layout or was loaded by IPC.
 - Resolution per id: user dir first, then shipped. Same id in both: user wins (info log).
   A different id (`my-clock`) replaces the shipped one by editing the user layout.
+  If a user module fails to load (syntax error, missing files) the host logs a warning and falls back to
+  the next candidate; the placeholder appears only when every candidate fails.
 - Layout merge: shipped `layouts/default.json` is HyDE-owned; user `layout.json` is
   user-owned. A zone named in the user layout replaces that zone wholesale; other zones and
   `edge` come from the shipped layout.
@@ -108,8 +114,8 @@ watch may not survive a replace-by-rename write (to be verified against wallbash
 ### Services
 
 - `Battery`: `available`, `percent`, `charging`, `state` (`normal|warning|critical`);
-  aggregates multiple batteries (the dev machine has two). Wraps UPower.
-- `Backlight`: `available`, `percent`, `set(p)`; sysfs read, `brightnessctl` write.
+  wraps the UPower display device, which UPower already aggregates across batteries (the dev machine has two).
+- `Backlight`: `available`, `percent`, `set(p)`; `brightnessctl -m` read (avoids globbing sysfs from QML), `brightnessctl set` write.
 - Missing hardware: `available = false`, the module hides itself.
 
 ### ScriptView
@@ -120,7 +126,7 @@ or timeout restarts with backoff; manual refresh via IPC replaces Waybar signals
 
 ## Verification
 
-- Script checks in `tests/` (no framework): theme parsing, ScriptView JSON parsing, layout
+- Pure-logic checks in `tests/` (`node --test`, no dependencies): theme parsing, ScriptView JSON parsing, layout
   resolution. Each covers missing file/input, malformed content, wrong types, boundary
   values (empty zones, empty output) and unusual combinations (duplicate ids, unknown
   monitor names, same id in user and shipped dir).
