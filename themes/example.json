@@ -1,0 +1,6 @@
+{
+  "colors": { "bg": "#1e1e2e", "fg": "#cdd6f4", "accent": "#89b4fa", "muted": "#6c7086", "warning": "#f9e2af", "critical": "#f38ba8" },
+  "font": { "family": "sans", "size": 12 },
+  "radius": 8,
+  "spacing": 6
+}
