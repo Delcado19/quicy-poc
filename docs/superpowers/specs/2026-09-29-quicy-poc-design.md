@@ -148,5 +148,5 @@ or timeout restarts with backoff; manual refresh via IPC replaces Waybar signals
 - Theme scope: colors only, or also borders, rounding, fonts, icons? Source: wallbash JSON, Qt palette (`SystemPalette`), or both behind `Theme.qml`?
 - Attributing a frozen QML thread to one module. PoC covers only binding-loop log lines and the
   "heavy work in `Process`" convention; an external watchdog with bisect-restart is a later option.
-- Whether user-directory modules can import shell singletons (Quickshell ≥ 0.2.0 import rules).
+- ~~Whether user-directory modules can import shell singletons~~ Resolved: verified with Quickshell 0.3.1, a module loaded from a directory outside the shell tree (`QUICY_USER_DIR`) can `import qs.core` / `qs.services` and shares the same singleton instances (it follows a live theme change). The `theme` property fallback is not needed.
 - Autoload of module folders (optional `autoload` + `slot` in `module.json`), not built.
