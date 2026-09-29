@@ -12,7 +12,7 @@ notification server, lockscreen, launcher, tooltips or popups.
 ## Requirements
 
 - Quickshell 0.3.x (developed on 0.3.1)
-- `brightnessctl` (backlight module), coreutils `timeout` (periodic script modules)
+- `brightnessctl` (backlight module), coreutils `timeout` (every script module runs under it so hung children die with the run)
 - Node 20+ for the tests, `qmlformat` for the QML syntax check
 - HyDE is optional: without it the shell runs on `themes/example.json`
 
@@ -94,7 +94,7 @@ reported and ignored, the shipped layout stays in effect.
 
 | Call | Effect |
 |---|---|
-| `module load <id>` / `module unload <id>` | append an id to the right zone / hide an id until `layout reload` |
+| `module load <id>` / `module unload <id>` | append an id to the right zone of every bar / hide it until `layout reload`; both answer "no change" if there is nothing to do |
 | `module refresh <id>` | re-run a script module now |
 | `theme reload` / `layout reload` | re-read files (`layout reload` also clears load/unload state) |
 | `shell reload` | reload the whole config; needed after editing a module's QML |
@@ -130,7 +130,11 @@ verified live on Hyprland (see the plan and spec for the scenarios).
 - A frozen QML thread (endless loop in a module) freezes the whole shell and cannot be attributed to
   a module. The PoC only avoids it by convention (heavy work in `Process`); an external watchdog
   with bisecting restarts is a possible later step.
-- The backlight poll stops after three polls without a valid reading (e.g. `brightnessctl` missing).
+- The backlight poll stops after three polls without a valid reading (e.g. `brightnessctl` missing or no `backlight` class device; LEDs are ignored).
+- Killing quickshell with SIGTERM leaves the children of stream scripts running (`ScriptView` ends them when it stops a run, but nothing reaps them when the whole shell dies). Periodic runs end with their timeout.
+- A stream script that exits is restarted with a growing delay (1 s up to 1 min); only a run longer than 10 s resets it. Polling intervals below one second are raised to one second.
+- A module scrolled quickly can lose backlight steps (each wheel event is computed from the last read value).
+- Stream output without newlines is buffered without limit.
 - Only one monitor was available for testing; per-monitor overrides were exercised through the
   monitor's own `screens` entry.
 - A real wallbash run with the template has not been executed against the live HyDE install.

@@ -16,51 +16,74 @@ Item {
     // Set by refresh() so the resulting exit restarts immediately instead of
     // counting as a crash (which would grow the backoff).
     property bool manualRestart: false
+    property bool gotOutput: false   // the current run printed anything at all
+    property double startedAt: 0
+
+    // 0 = stream; anything else is floored at one second.
+    readonly property int poll: S.clampInterval(interval)
+
+    // Every run goes through coreutils `timeout`, which puts the command in its
+    // own process group and kills the whole group on expiry or on SIGTERM.
+    // Stopping the Process alone only signals the direct child, so a hung
+    // wrapper script or a pipeline (playerctl -F | jq) would leave its
+    // children running and pile up. Periodic runs get the real timeout;
+    // streams use duration 0, i.e. no timeout, for the group kill alone.
+    readonly property var effectiveCommand: command.length === 0 ? command
+        : ["timeout", "-k", "2", poll > 0 ? String(Math.max(1, Math.ceil(timeout / 1000))) : "0"].concat(command)
 
     implicitWidth: label.implicitWidth
     implicitHeight: label.implicitHeight
 
     function refresh() {
         if (command.length === 0) return;
-        if (interval === 0) {
+        if (poll === 0) {
             if (proc.running) { manualRestart = true; proc.running = false; }
             else { restart.interval = 1; restart.restart(); }
         } else if (!proc.running) proc.running = true;
     }
 
-    // Periodic runs go through coreutils `timeout`, which kills the whole
-    // process group. Stopping the Process alone only signals the direct child,
-    // so a hung wrapper script would leave its children (curl, sleep, ...)
-    // running and pile up one orphan per interval.
-    readonly property var effectiveCommand: interval > 0 && command.length > 0
-        ? ["timeout", "-k", "2", String(Math.max(1, Math.ceil(timeout / 1000)))].concat(command)
-        : command
-
     Process {
         id: proc
         command: root.effectiveCommand
-        running: root.command.length > 0 && root.interval === 0
+        running: root.command.length > 0 && root.poll === 0
         stdout: SplitParser {
             onRead: line => {
                 var r = S.parseScriptLine(line, root.value);
                 root.value = r.value;
-                root.error = r.error === null ? "" : r.error;
-                if (r.error === null) root.backoff = 1000;
-                else console.warn("[quicy] " + root.moduleId + ": " + r.error);
+                var msg = r.error === null ? "" : r.error;
+                // Log only when the problem changes: a script that prints plain
+                // text every second would otherwise flood the log.
+                if (msg !== "" && msg !== root.error) console.warn("[quicy] " + root.moduleId + ": " + msg);
+                root.error = msg;
+                root.gotOutput = true;
             }
         }
-        onStarted: if (root.interval > 0) killer.restart()
+        onStarted: {
+            root.startedAt = Date.now();
+            root.gotOutput = false;
+            if (root.poll > 0) killer.restart();
+        }
         onExited: (code, status) => {
             killer.stop();
-            if (root.interval === 0 && root.command.length > 0) {
+            // A run that printed nothing must not leave old data looking
+            // current (no network, script crashed, timed out). A run that
+            // printed garbage already set its own, more specific error.
+            var note = S.exitNote(root.gotOutput, code);
+            if (note !== "") {
+                if (note !== root.error) console.warn("[quicy] " + root.moduleId + ": " + note);
+                root.error = note;
+            }
+            if (root.poll === 0 && root.command.length > 0) {
                 if (root.manualRestart) {
                     root.manualRestart = false;
                     restart.interval = 1;
                 } else {
                     // A stream that dies is restarted with growing delay so a
-                    // script that exits immediately cannot spin the CPU.
-                    restart.interval = root.backoff;
-                    root.backoff = S.nextBackoff(root.backoff);
+                    // script that exits immediately cannot spin the CPU. Only a
+                    // run that lasted a while resets the delay.
+                    var plan = S.restartPlan(root.backoff, Date.now() - root.startedAt);
+                    restart.interval = plan.delay;
+                    root.backoff = plan.next;
                 }
                 restart.restart();
             }
@@ -68,8 +91,8 @@ Item {
     }
 
     Timer {
-        interval: root.interval
-        running: root.interval > 0 && root.command.length > 0
+        interval: root.poll
+        running: root.poll > 0 && root.command.length > 0
         repeat: true
         triggeredOnStart: true
         onTriggered: if (!proc.running) proc.running = true

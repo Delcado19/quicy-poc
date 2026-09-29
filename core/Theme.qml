@@ -60,16 +60,10 @@ Singleton {
         onLoadFailed: { root.generatedOk = false; root.refresh(); }
     }
 
-    // The file watch cannot be armed on a file whose directory does not exist
-    // yet (first wallbash run after installing) and is lost when the file is
-    // deleted. Wait for the file with one idle shell instead of polling
-    // FileView, which would log a warning on every poll.
-    Process {
-        running: !root.generatedOk && Paths.stateDir !== ""
-        // The loop also ends when quickshell is gone: children are not reaped
-        // when the shell is killed, and an unguarded loop would run forever.
-        command: ["sh", "-c", 'p=$PPID; while [ ! -f "$1" ] && kill -0 $p 2>/dev/null; do sleep 2; done', "sh", Paths.stateDir + "/theme.json"]
-        onExited: generated.reload()
+    FileWaiter {
+        path: Paths.stateDir === "" ? "" : Paths.stateDir + "/theme.json"
+        wanted: !root.generatedOk
+        onAppeared: generated.reload()
     }
 
     FileView {

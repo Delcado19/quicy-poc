@@ -6,6 +6,9 @@ function parseBrightnessctl(line) {
     if (typeof line !== "string") return null;
     var f = line.trim().split(",");
     if (f.length < 5) return null;
+    // Without a backlight brightnessctl falls back to LEDs (capslock, mic mute),
+    // which must not show up as a screen brightness.
+    if (f[f.length - 4] !== "backlight") return null;
     var m = /^(\d{1,3})%$/.exec(f[f.length - 2]);
     if (!m) return null;
     var p = parseInt(m[1], 10);

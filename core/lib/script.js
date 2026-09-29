@@ -49,4 +49,32 @@ function nextBackoff(prev) {
     return Math.min(prev * 2, 60000);
 }
 
-if (typeof module !== "undefined") module.exports = { parseScriptLine: parseScriptLine, lastLine: lastLine, nextBackoff: nextBackoff };
+// A run that lasted this long counts as healthy: only then the restart delay
+// starts over. Resetting on every valid line would restart a one-shot script
+// that prints a line and exits (e.g. a weather fetch used without an interval)
+// once per second, forever.
+var STABLE_MS = 10000;
+
+function restartPlan(prev, runMs) {
+    var base = (typeof prev === "number" && isFinite(prev) && prev > 0) ? prev : 1000;
+    if (typeof runMs === "number" && isFinite(runMs) && runMs >= STABLE_MS) base = 1000;
+    return { delay: base, next: nextBackoff(base) };
+}
+
+// 0 means "long-running stream". Anything else is a polling interval with a
+// floor of one second so a typo cannot fork a process back-to-back.
+function clampInterval(ms) {
+    if (typeof ms !== "number" || !isFinite(ms) || ms <= 0) return 0;
+    return Math.max(1000, Math.round(ms));
+}
+
+// Explains a periodic run that ended without producing a valid line, so the
+// bar does not present old data as current.
+function exitNote(gotLine, code) {
+    if (gotLine) return "";
+    if (code === 124) return "timed out";
+    if (typeof code === "number" && code !== 0) return "no output (exit code " + code + ")";
+    return "no output";
+}
+
+if (typeof module !== "undefined") module.exports = { parseScriptLine: parseScriptLine, lastLine: lastLine, nextBackoff: nextBackoff, restartPlan: restartPlan, clampInterval: clampInterval, exitNote: exitNote };

@@ -114,27 +114,60 @@ test("allIds collects default and screen ids uniquely", () => {
   assert.deepEqual(L.allIds(m).sort(), ["backlight", "battery", "weather", "x"]);
 });
 
-test("loadId/unloadId state transitions", () => {
-  let s = { extra: [], hidden: [] };
-  let r = L.loadId(s, "clock", false);
+test("defaultIds lists only the default block, allIds also the screen overrides", () => {
+  const m = L.mergeLayout(parse(SHIPPED), parse({ screens: { "DP-1": { center: ["only-dp"] } } }));
+  assert.deepEqual(L.defaultIds(m).sort(), ["backlight", "battery", "weather"]);
+  assert.ok(L.allIds(m).includes("only-dp"));
+});
+
+test("load/unload: an id outside the layout is added once and removed once", () => {
+  let r = L.loadId({ extra: [], hidden: [] }, "clock", false);
   assert.deepEqual([r.changed, r.state.extra], [true, ["clock"]]);
   r = L.loadId(r.state, "clock", false);
   assert.equal(r.changed, false);
-  r = L.loadId(r.state, "battery", true);
-  assert.equal(r.changed, false);
-  r = L.unloadId(r.state, "clock");
+  r = L.unloadId(r.state, "clock", false);
   assert.deepEqual([r.changed, r.state.extra, r.state.hidden], [true, [], []]);
-  r = L.unloadId(r.state, "battery");
+  // a second unload must not leave a stale "hidden" entry behind
+  r = L.unloadId(r.state, "clock", false);
+  assert.deepEqual([r.changed, r.state.hidden], [false, []]);
+  r = L.loadId(r.state, "clock", false);
+  assert.deepEqual([r.changed, r.state.extra], [true, ["clock"]]);
+});
+
+test("load/unload: a layout id is hidden and un-hidden", () => {
+  let r = L.unloadId({ extra: [], hidden: [] }, "battery", true);
   assert.deepEqual([r.changed, r.state.hidden], [true, ["battery"]]);
-  r = L.unloadId(r.state, "battery");
+  r = L.unloadId(r.state, "battery", true);
   assert.equal(r.changed, false);
   r = L.loadId(r.state, "battery", true);
-  assert.deepEqual([r.changed, r.state.hidden], [true, []]);
+  assert.deepEqual([r.changed, r.state.hidden, r.state.extra], [true, [], []]);
+  r = L.loadId(r.state, "battery", true);
+  assert.equal(r.changed, false);
+});
+
+test("unload of an id that exists nowhere reports no change", () => {
+  const r = L.unloadId({ extra: [], hidden: [] }, "ghost", false);
+  assert.deepEqual([r.changed, r.state.hidden, r.state.extra], [false, [], []]);
+});
+
+test("load of an id that is hidden but not in the layout still shows it", () => {
+  const r = L.loadId({ extra: [], hidden: ["x"] }, "x", false);
+  assert.deepEqual([r.changed, r.state.hidden, r.state.extra], [true, [], ["x"]]);
+});
+
+test("an id that only a screen override shows is added on the other bars, not duplicated", () => {
+  const m = L.mergeLayout(parse(SHIPPED), parse({ screens: { "DP-1": { center: ["only-dp"] } } }));
+  const inDefault = L.defaultIds(m).includes("only-dp");
+  const r = L.loadId({ extra: [], hidden: [] }, "only-dp", inDefault);
+  assert.equal(r.changed, true);
+  assert.ok(L.forScreen(m, "eDP-1", r.state.extra, r.state.hidden).right.includes("only-dp"));
+  const dp = L.forScreen(m, "DP-1", r.state.extra, r.state.hidden);
+  assert.deepEqual([dp.center, dp.right.includes("only-dp"), dp.problems], [["only-dp"], false, []]);
 });
 
 test("state transitions do not mutate their input", () => {
   const s = { extra: ["a"], hidden: [] };
   L.loadId(s, "b", false);
-  L.unloadId(s, "a");
+  L.unloadId(s, "a", false);
   assert.deepEqual(s, { extra: ["a"], hidden: [] });
 });

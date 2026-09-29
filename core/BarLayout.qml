@@ -19,6 +19,7 @@ Singleton {
 
     property bool shippedDone: false
     property bool userDone: false
+    property bool userOk: false
     property string _signature: ""
 
     function refresh() {
@@ -52,13 +53,13 @@ Singleton {
     }
 
     function load(id) {
-        var r = L.loadId(state, id, L.allIds(merged).indexOf(id) >= 0);
+        var r = L.loadId(state, id, L.defaultIds(merged).indexOf(id) >= 0);
         if (r.changed) { state = r.state; revision++; }
         return r.changed;
     }
 
     function unload(id) {
-        var r = L.unloadId(state, id);
+        var r = L.unloadId(state, id, L.allIds(merged).indexOf(id) >= 0);
         if (r.changed) { state = r.state; revision++; }
         return r.changed;
     }
@@ -77,7 +78,15 @@ Singleton {
         path: Paths.userDir === "" ? "" : Paths.userDir + "/layout.json"
         watchChanges: true
         onFileChanged: root.reload()
-        onLoaded: { root.userDone = true; root.refresh(); }
-        onLoadFailed: { root.userDone = true; root.refresh(); }
+        onLoaded: { root.userOk = true; root.userDone = true; root.refresh(); }
+        onLoadFailed: { root.userOk = false; root.userDone = true; root.refresh(); }
+    }
+
+    // First use: neither ~/.config/quicy nor layout.json exists yet, and the
+    // watch above cannot be armed on a missing file.
+    FileWaiter {
+        path: Paths.userDir === "" ? "" : Paths.userDir + "/layout.json"
+        wanted: !root.userOk
+        onAppeared: user.reload()
     }
 }

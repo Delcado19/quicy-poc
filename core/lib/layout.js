@@ -116,29 +116,45 @@ function allIds(m) {
     return out;
 }
 
-function copyState(s) { return { extra: s.extra.slice(), hidden: s.hidden.slice() }; }
-
-// IPC "load": un-hides a layout id, or appends an id that is not in the layout.
-function loadId(state, id, inLayout) {
-    var s = copyState(state);
-    var hi = s.hidden.indexOf(id);
-    if (hi >= 0) { s.hidden.splice(hi, 1); return { state: s, changed: true }; }
-    if (inLayout || s.extra.indexOf(id) >= 0) return { state: s, changed: false };
-    s.extra.push(id);
-    return { state: s, changed: true };
+function defaultIds(m) {
+    var seen = Object.create(null);
+    var out = [];
+    ZONES.forEach(function (z) {
+        (m["default"][z] || []).forEach(function (id) {
+            if (!seen[id]) { seen[id] = true; out.push(id); }
+        });
+    });
+    return out;
 }
 
-// IPC "unload": removes an IPC-loaded id, or hides a layout id until reload.
-function unloadId(state, id) {
+function copyState(s) { return { extra: s.extra.slice(), hidden: s.hidden.slice() }; }
+
+// IPC "load": un-hides an id, and appends it to the right zone of every bar
+// unless the default layout already shows it. `inLayout` refers to the default
+// block only: an id that just one screen override shows still has to be
+// added for the other bars (forScreen skips extras a screen already has).
+function loadId(state, id, inLayout) {
+    var s = copyState(state);
+    var changed = false;
+    var hi = s.hidden.indexOf(id);
+    if (hi >= 0) { s.hidden.splice(hi, 1); changed = true; }
+    if (!inLayout && s.extra.indexOf(id) < 0) { s.extra.push(id); changed = true; }
+    return { state: s, changed: changed };
+}
+
+// IPC "unload": removes an IPC-loaded id, or hides an id the layout shows
+// (anywhere) until the next reload. An id that is not shown at all is not
+// recorded, otherwise a later load would only "undo" that phantom hide.
+function unloadId(state, id, inLayout) {
     var s = copyState(state);
     var ei = s.extra.indexOf(id);
     if (ei >= 0) { s.extra.splice(ei, 1); return { state: s, changed: true }; }
-    if (s.hidden.indexOf(id) >= 0) return { state: s, changed: false };
+    if (!inLayout || s.hidden.indexOf(id) >= 0) return { state: s, changed: false };
     s.hidden.push(id);
     return { state: s, changed: true };
 }
 
 if (typeof module !== "undefined") module.exports = {
     parseLayout: parseLayout, mergeLayout: mergeLayout, forScreen: forScreen,
-    allIds: allIds, loadId: loadId, unloadId: unloadId
+    allIds: allIds, defaultIds: defaultIds, loadId: loadId, unloadId: unloadId
 };

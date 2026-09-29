@@ -32,7 +32,7 @@ syntax errors stay inside that module (placeholder + log line naming the module)
 ```text
 shell.qml                 entry: one PanelWindow per screen (Variants)
 core/
-  Theme.qml               singleton, FileView + JsonAdapter, defaults for every value
+  Theme.qml               singleton, FileView + lib/theme.js parsing, defaults for every value
   ModuleHost.qml          resolves id -> Module.qml, Loader, error placeholder
   BarLayout.qml           merges default + user layout, per-screen lookup, IPC-loaded ids
   Paths.qml               singleton: user/state/shared dirs, host API version
@@ -96,7 +96,7 @@ Theme resolution: generated theme, then `themes/example.json`, then defaults in 
   monitor names are ignored; a zone set to `[]` is empty. Bars are separate instances per
   monitor (not mirrored); services are shared singletons.
 - Edge cases: duplicate id within one bar (first wins, warning); id without any module
-  (placeholder + log); `module load` for a running id (no-op + log).
+  (placeholder + log); `module load` for an id that is already shown and `module unload` for an id that is not shown return "no change" to the IPC caller (nothing is logged).
 
 ### Theme
 
@@ -124,7 +124,7 @@ and skips the template if it is missing, and a watch cannot be armed on a missin
 
 Runs a command periodically or as a stream, reads one JSON object per output.
 Malformed or empty output keeps the last valid value and shows an error state; process exit
-or timeout restarts with backoff; periodic runs are wrapped in coreutils `timeout` so a hung run's child processes die with it (stopping only the direct child leaves orphans); manual refresh via IPC replaces Waybar signals.
+or timeout restarts with backoff (only a run that lasted 10 s resets the delay, so a one-shot script used without an interval is not restarted every second); every run is wrapped in coreutils `timeout` (a real timeout for periodic runs, duration 0 for streams) so the whole process group dies with the run; polling intervals have a one-second floor; a periodic or stream run that printed nothing shows the error state; manual refresh via IPC replaces Waybar signals.
 
 ## Verification
 

@@ -56,3 +56,38 @@ test("nextBackoff doubles, starts at 1000 and caps at 60000", () => {
   assert.equal(S.nextBackoff(1e9), 60000);
   for (const bad of [0, -5, NaN, Infinity, undefined, null, "1000"]) assert.equal(S.nextBackoff(bad), 1000, String(bad));
 });
+
+test("restartPlan: short runs keep growing the backoff, stable runs reset it", () => {
+  assert.deepEqual(S.restartPlan(1000, 0), { delay: 1000, next: 2000 });
+  assert.deepEqual(S.restartPlan(4000, 500), { delay: 4000, next: 8000 });
+  assert.deepEqual(S.restartPlan(32000, 9999), { delay: 32000, next: 60000 });
+  assert.deepEqual(S.restartPlan(32000, 10000), { delay: 1000, next: 2000 });
+  assert.deepEqual(S.restartPlan(60000, 120000), { delay: 1000, next: 2000 });
+});
+
+test("restartPlan: invalid input counts as a short run from the base delay", () => {
+  for (const runMs of [NaN, undefined, null, -5, "20000", Infinity]) {
+    assert.deepEqual(S.restartPlan(4000, runMs), { delay: 4000, next: 8000 }, String(runMs));
+  }
+  for (const prev of [0, -1, NaN, undefined, null]) {
+    assert.deepEqual(S.restartPlan(prev, 0), { delay: 1000, next: 2000 }, String(prev));
+  }
+});
+
+test("clampInterval: 0 stays a stream, tiny values get a floor, junk becomes a stream", () => {
+  assert.equal(S.clampInterval(0), 0);
+  assert.equal(S.clampInterval(1), 1000);
+  assert.equal(S.clampInterval(999), 1000);
+  assert.equal(S.clampInterval(1000), 1000);
+  assert.equal(S.clampInterval(3600000), 3600000);
+  for (const bad of [-1, NaN, undefined, null, "5000", Infinity, 1.5]) assert.equal(S.clampInterval(bad), bad === 1.5 ? 1000 : 0, String(bad));
+});
+
+test("exitNote reports a run that produced no valid line", () => {
+  assert.equal(S.exitNote(true, 0), "");
+  assert.equal(S.exitNote(true, 1), "");
+  assert.match(S.exitNote(false, 0), /no output/);
+  assert.match(S.exitNote(false, 7), /exit code 7/);
+  assert.match(S.exitNote(false, undefined), /no output/);
+  assert.match(S.exitNote(false, 124), /timed out/);
+});

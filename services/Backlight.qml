@@ -18,13 +18,13 @@ Singleton {
     function set(p) {
         var v = K.clampPercent(p);
         if (v === null) return;
-        setProc.command = ["brightnessctl", "set", v + "%"];
+        setProc.command = ["brightnessctl", "-c", "backlight", "set", v + "%"];
         setProc.running = true;
     }
 
     Process {
         id: readProc
-        command: ["brightnessctl", "-m"]
+        command: ["brightnessctl", "-c", "backlight", "-m"]
         running: true
         stdout: SplitParser {
             onRead: line => {

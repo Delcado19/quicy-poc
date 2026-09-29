@@ -125,3 +125,28 @@ test("unset HOME is refused", () => {
   const r = spawnSync("sh", [SCRIPT, "/x"], { env: { PATH: process.env.PATH }, encoding: "utf8" });
   assert.notEqual(r.status, 0);
 });
+
+test("an unwritable backup root fails fast instead of looping", () => {
+  const { home, env } = fakeHome();
+  const f = path.join(home, "f");
+  fs.writeFileSync(f, "x");
+  const ro = path.join(home, "ro");
+  fs.mkdirSync(ro);
+  fs.chmodSync(ro, 0o555);
+  const r = spawnSync("sh", [SCRIPT, f], { env: { ...env, QUICY_BACKUP_DIR: path.join(ro, "b") }, encoding: "utf8", timeout: 5000 });
+  fs.chmodSync(ro, 0o755);
+  assert.equal(r.error, undefined, "must not hang");
+  assert.notEqual(r.status, 0);
+  assert.ok(r.stderr.length < 2000, "no error flood");
+});
+
+test("a regular file at the backup root fails fast", () => {
+  const { home, env } = fakeHome();
+  const f = path.join(home, "f");
+  fs.writeFileSync(f, "x");
+  const blocker = path.join(home, "blocker");
+  fs.writeFileSync(blocker, "not a dir");
+  const r = spawnSync("sh", [SCRIPT, f], { env: { ...env, QUICY_BACKUP_DIR: blocker }, encoding: "utf8", timeout: 5000 });
+  assert.equal(r.error, undefined, "must not hang");
+  assert.notEqual(r.status, 0);
+});

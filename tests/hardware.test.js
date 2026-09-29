@@ -36,6 +36,12 @@ test("parseBrightnessctl rejects garbage", () => {
   }
 });
 
+test("parseBrightnessctl only accepts the backlight class (machines without a backlight list LEDs)", () => {
+  assert.equal(K.parseBrightnessctl("input3::capslock,leds,0,0%,1"), null);
+  assert.equal(K.parseBrightnessctl("platform::micmute,leds,1,100%,1"), null);
+  assert.equal(K.parseBrightnessctl("odd,name,backlight,480,5%,9600"), 5);
+});
+
 test("clampPercent bounds, rounding and invalid input", () => {
   assert.equal(K.clampPercent(50), 50);
   assert.equal(K.clampPercent(0), 1);
