@@ -32,6 +32,14 @@ Singleton {
         function reload(): string { Theme.reload(); return "theme reloaded"; }
     }
 
+    // Qt caches loaded components by URL, so editing a module's QML and doing
+    // module unload/load keeps running the old code. A config reload starts a
+    // fresh engine and picks the change up.
+    IpcHandler {
+        target: "shell"
+        function reload(): string { Quickshell.reload(false); return "shell reloading"; }
+    }
+
     IpcHandler {
         target: "layout"
         function reload(): string { BarLayout.reload(); return "layout reloaded"; }

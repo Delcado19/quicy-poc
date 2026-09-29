@@ -17,13 +17,26 @@ Singleton {
         try { return view.text(); } catch (e) { return ""; }
     }
 
+    property bool shippedDone: false
+    property bool userDone: false
+    property string _signature: ""
+
     function refresh() {
+        // Wait for both files: a first merge with only one of them would make
+        // every bar build its modules twice (and run their scripts twice).
+        if (!shippedDone || !(userDone || Paths.userDir === "")) return;
         var s = L.parseLayout(textOf(shipped));
         var u = L.parseLayout(textOf(user));
         s.problems.forEach(function (p) { console.warn("[quicy] shipped layout: " + p); });
         u.problems.forEach(function (p) { console.warn("[quicy] user layout: " + p); });
-        merged = L.mergeLayout(s.layout, u.layout);
+        var m = L.mergeLayout(s.layout, u.layout);
+        var sig = JSON.stringify(m);
         state = { extra: [], hidden: [] }; // reload discards IPC-loaded/hidden ids
+        // An unchanged layout must not bump the revision: that rebuilds every
+        // module of every bar.
+        if (sig === _signature && revision > 0) return;
+        _signature = sig;
+        merged = m;
         revision++;
     }
 
@@ -55,8 +68,8 @@ Singleton {
         path: Paths.sharedDir + "/layouts/default.json"
         watchChanges: true
         onFileChanged: root.reload()
-        onLoaded: root.refresh()
-        onLoadFailed: root.refresh()
+        onLoaded: { root.shippedDone = true; root.refresh(); }
+        onLoadFailed: { root.shippedDone = true; root.refresh(); }
     }
 
     FileView {
@@ -64,7 +77,7 @@ Singleton {
         path: Paths.userDir === "" ? "" : Paths.userDir + "/layout.json"
         watchChanges: true
         onFileChanged: root.reload()
-        onLoaded: root.refresh()
-        onLoadFailed: root.refresh()
+        onLoaded: { root.userDone = true; root.refresh(); }
+        onLoadFailed: { root.userDone = true; root.refresh(); }
     }
 }
