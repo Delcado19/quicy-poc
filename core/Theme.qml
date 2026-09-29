@@ -25,7 +25,12 @@ Singleton {
         try { return view.text(); } catch (e) { return ""; }
     }
 
+    property bool shippedDone: false
+
     function refresh() {
+        // The shipped theme is the last fallback; deciding before it has been
+        // read would log a misleading "no usable theme" during startup.
+        if (!shippedDone) return;
         var r = T.pickTheme([textOf(generated), textOf(shipped)], root._last);
         r.problems.forEach(function (p) { console.warn("[quicy] theme: " + p); });
         var t = r.theme;
@@ -68,7 +73,7 @@ Singleton {
     FileView {
         id: shipped
         path: Paths.sharedDir + "/themes/example.json"
-        onLoaded: root.refresh()
-        onLoadFailed: root.refresh()
+        onLoaded: { root.shippedDone = true; root.refresh(); }
+        onLoadFailed: { root.shippedDone = true; root.refresh(); }
     }
 }
