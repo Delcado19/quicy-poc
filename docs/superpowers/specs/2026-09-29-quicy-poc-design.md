@@ -1,6 +1,6 @@
 # QuiCy PoC – Design
 
-Status: draft, awaiting review (2026-09-29)
+Status: implemented and verified live on Hyprland / Quickshell 0.3.1 (2026-09-29); the real wallbash run against the live HyDE install is still open
 Context: HyDE Discussion #2038 (Quickshell infrastructure). Background notes: `~/quickshell-poc/notes/`.
 
 ## Purpose
@@ -108,8 +108,10 @@ Flat JSON, scope deliberately small:
 ```
 
 Missing file, malformed JSON or wrongly typed fields fall back to defaults and log the cause.
-Live reload via `watchChanges`; it re-arms the watch on every `fileChanged`, because the
-watch may not survive a replace-by-rename write (to be verified against wallbash).
+Live reload via `watchChanges`. Verified: the watch survives replace-by-rename writes (wallbash
+writes with `mktemp` + `mv`), no re-arming needed. wallbash does not create the target directory
+and skips the template if it is missing, and a watch cannot be armed on a missing directory, so
+`Theme.qml` runs one idle shell that waits for the file (it exits with quickshell).
 
 ### Services
 
