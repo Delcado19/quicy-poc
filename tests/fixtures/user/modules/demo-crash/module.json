@@ -1,0 +1,1 @@
+{"name":"demo-crash","api":1,"options":{"command":["sh","-c","exit 1"],"interval":0}}

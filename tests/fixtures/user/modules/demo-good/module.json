@@ -1,0 +1,1 @@
+{"name":"demo-good","api":1,"options":{"command":["sh","-c","echo '{\"text\":\"ok\",\"class\":\"warning\"}'"],"interval":2000}}

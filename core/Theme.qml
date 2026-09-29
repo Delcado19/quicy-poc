@@ -66,7 +66,9 @@ Singleton {
     // FileView, which would log a warning on every poll.
     Process {
         running: !root.generatedOk && Paths.stateDir !== ""
-        command: ["sh", "-c", 'while [ ! -f "$1" ]; do sleep 2; done', "sh", Paths.stateDir + "/theme.json"]
+        // The loop also ends when quickshell is gone: children are not reaped
+        // when the shell is killed, and an unguarded loop would run forever.
+        command: ["sh", "-c", 'p=$PPID; while [ ! -f "$1" ] && kill -0 $p 2>/dev/null; do sleep 2; done', "sh", Paths.stateDir + "/theme.json"]
         onExited: generated.reload()
     }
 

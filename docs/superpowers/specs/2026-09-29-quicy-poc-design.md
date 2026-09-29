@@ -122,7 +122,7 @@ watch may not survive a replace-by-rename write (to be verified against wallbash
 
 Runs a command periodically or as a stream, reads one JSON object per output.
 Malformed or empty output keeps the last valid value and shows an error state; process exit
-or timeout restarts with backoff; manual refresh via IPC replaces Waybar signals.
+or timeout restarts with backoff; periodic runs are wrapped in coreutils `timeout` so a hung run's child processes die with it (stopping only the direct child leaves orphans); manual refresh via IPC replaces Waybar signals.
 
 ## Verification
 

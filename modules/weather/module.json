@@ -1,0 +1,1 @@
+{"name":"weather","api":1,"options":{"command":["hyde-shell","weather"],"interval":3600000}}

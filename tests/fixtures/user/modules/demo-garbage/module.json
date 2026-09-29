@@ -1,0 +1,1 @@
+{"name":"demo-garbage","api":1,"options":{"command":["sh","-c","echo not-json"],"interval":2000}}

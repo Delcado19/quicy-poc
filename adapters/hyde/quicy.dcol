@@ -1,0 +1,14 @@
+${HOME}/.local/state/quicy/theme.json|
+{
+  "colors": {
+    "bg": "#<wallbash_pry1>",
+    "fg": "#<wallbash_txt1>",
+    "accent": "#<wallbash_1xa7>",
+    "muted": "#<wallbash_3xa6>",
+    "warning": "#<wallbash_1xa6>",
+    "critical": "#<wallbash_1xa8>"
+  },
+  "font": { "family": "sans", "size": 12 },
+  "radius": 8,
+  "spacing": 6
+}
