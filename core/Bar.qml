@@ -10,12 +10,14 @@ PanelWindow {
         right: true
         bottom: true
     }
-    implicitHeight: 28
-    color: "#1e1e2e"
+    implicitHeight: Math.round(Theme.fontSize * 2 + Theme.spacing * 2)
+    color: Theme.bg
 
     Text {
         anchors.centerIn: parent
-        color: "#cdd6f4"
+        color: Theme.fg
+        font.family: Theme.fontFamily
+        font.pixelSize: Theme.fontSize
         text: (win.screen ? win.screen.name : "?") + "  shared=" + Paths.sharedDir + "  user=" + Paths.userDir
     }
 }
