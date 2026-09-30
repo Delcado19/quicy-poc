@@ -29,7 +29,7 @@ QUICY_USER_DIR=/some/dir qs -p .
 shell.qml            entry point: one PanelWindow per monitor
 core/                Theme, BarLayout, ModuleHost, Ipc, Paths (+ lib/*.js: pure logic)
 services/            singletons with a stable interface over Quickshell types (Battery, Backlight)
-components/          ScriptView: runs a command and renders Waybar-style JSON
+components/          ScriptView (runs a command, renders Waybar-style JSON), Popover (panel that comes out of an entry)
 modules/             shipped modules: battery, backlight, weather, hello (host test module)
 adapters/hyde/       everything HyDE-specific (wallbash template, backup/install scripts)
 layouts/default.json shipped layout        themes/example.json fallback theme
@@ -74,6 +74,10 @@ A module is a folder `modules/<id>/` with a `module.json` and a `Module.qml`.
   (0.3 s); entries get a rounded hover fill (0.12 s in, 0.16 s out) and, if they react to clicks, a small
   press effect; entries glide when a text changes width; modules added or removed by the layout or IPC grow
   and fade in (0.2 s) or shrink and fade out (0.15 s) while the neighbours slide along.
+- `components/Popover.qml` is the building block for anything that opens from an entry. A module places one
+  in its own tree and puts the content inside it, for example `Popover { target: root; Text { ... } }`. It
+  handles the hover delay, position (flips when there is no room), the grow-and-fade animation and the look.
+  Set `hoverTrigger: false` and drive `open` for panels that open some other way, such as a click.
 - The `battery` module shows a Nerd Font icon: battery with a bolt while charging, plain battery
   while discharging, a power plug when plugged in without charging (full or held by a charge limit).
   The icons are options in `modules/battery/module.json` (`options.symbols.charging|discharging|idle`,

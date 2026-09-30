@@ -112,102 +112,31 @@ Item {
         function onRefreshRequested(id) { if (id === root.moduleId) root.refresh(); }
     }
 
-    // Hover tooltip: the script's "tooltip" field, shown in a popup next to the
-    // entry (Waybar shows the same field). Shown after a short delay so sweeping
-    // the pointer across the bar does not flash popups.
+    // Hover tooltip: the script's "tooltip" field, shown in a popover next to the
+    // entry (Waybar shows the same field).
     readonly property string tooltipText: S.tooltipMarkup(value.tooltip)
-    property bool showTip: false
 
-    // The popup slides up out of the bar edge and fades in. The slide is slow
-    // (Motion.spatialIn) and the fade fast, as in the reference shells, so the
-    // text is readable while the panel is still settling. A Behavior retargets
-    // from the current value, so moving the pointer in and out quickly reverses
-    // the motion instead of restarting it. Closing is quicker, same path.
-    property real slide: showTip ? 1 : 0
-    Behavior on slide {
-        NumberAnimation {
-            duration: Theme.reduceMotion ? 0 : (root.showTip ? Motion.spatialIn : Motion.spatialOut)
-            easing.type: Easing.BezierSpline
-            easing.bezierCurve: root.showTip ? Motion.emphasizedDecel : Motion.standard
+    Popover {
+        target: root
+        enabled: root.tooltipText !== ""
+
+        // Same text without wrapping, only to learn its natural width.
+        Text {
+            id: measure
+            visible: false
+            text: root.tooltipText
+            textFormat: Text.StyledText
+            font.family: Theme.fontFamily
+            font.pixelSize: Theme.fontSize
         }
-    }
-    property real fade: showTip ? 1 : 0
-    Behavior on fade {
-        NumberAnimation {
-            duration: Theme.reduceMotion ? Motion.reduced : (root.showTip ? Motion.effectsIn : Motion.effectsOut)
-            easing.type: Easing.BezierSpline
-            easing.bezierCurve: Motion.effects
-        }
-    }
-
-    HoverHandler {
-        id: hover
-        onHoveredChanged: if (!hovered) root.showTip = false
-    }
-
-    Timer {
-        interval: 250
-        running: hover.hovered && root.tooltipText !== "" && !root.showTip
-        onTriggered: root.showTip = true
-    }
-
-    PopupWindow {
-        // Stays mapped while the closing animation runs.
-        visible: root.tooltipText !== "" && (root.showTip || root.slide > 0.001 || root.fade > 0.001)
-        anchor.item: root
-        anchor.rect.x: 0
-        anchor.rect.y: 0
-        anchor.rect.width: root.width
-        anchor.rect.height: root.height
-        // Open away from the bar edge; Flip turns it around if there is no room.
-        anchor.edges: Edges.Top
-        anchor.gravity: Edges.Top
-        anchor.adjustment: PopupAdjustment.Flip | PopupAdjustment.Slide
-        implicitWidth: tipBox.width
-        implicitHeight: tipBox.height
-        color: "transparent"
-
-        Rectangle {
-            id: tipBox
-            opacity: root.fade
-            // Grows from the bar edge as well as sliding up (no overshoot: the popup
-            // window would clip it).
-            scale: Theme.reduceMotion ? 1 : Motion.popupScale + (1 - Motion.popupScale) * root.slide
-            transformOrigin: Item.Bottom
-            // The popup window clips to its own area, whose bottom edge sits at
-            // the bar: sliding up from below reads as coming out of the bar.
-            // Reduced motion only fades.
-            y: Theme.reduceMotion ? 0 : (1 - root.slide) * Math.min(height, 200)
-            width: Math.min(560, measure.implicitWidth) + 2 * Theme.spacing * 2
-            height: tip.implicitHeight + 2 * Theme.spacing * 2
-            radius: Theme.radius
-            // Near-opaque: the bar's own background lets the wallpaper shine through.
-            color: Qt.rgba(Theme.bg.r, Theme.bg.g, Theme.bg.b, 0.96)
-            border.width: 1
-            border.color: Qt.rgba(Theme.fg.r, Theme.fg.g, Theme.fg.b, 0.25)
-
-            // Same text without wrapping, only to learn its natural width.
-            Text {
-                id: measure
-                visible: false
-                text: root.tooltipText
-                textFormat: Text.StyledText
-                font.family: Theme.fontFamily
-                font.pixelSize: Theme.fontSize
-            }
-
-            Text {
-                id: tip
-                x: Theme.spacing * 2
-                y: Theme.spacing * 2
-                width: parent.width - 4 * Theme.spacing
-                text: root.tooltipText
-                textFormat: Text.StyledText
-                wrapMode: Text.Wrap
-                color: Theme.fg
-                font.family: Theme.fontFamily
-                font.pixelSize: Theme.fontSize
-            }
+        Text {
+            width: Math.min(560, measure.implicitWidth)
+            text: root.tooltipText
+            textFormat: Text.StyledText
+            wrapMode: Text.Wrap
+            color: Theme.fg
+            font.family: Theme.fontFamily
+            font.pixelSize: Theme.fontSize
         }
     }
 

@@ -241,7 +241,7 @@ peeks and panels are occasional to tens a day.
 | 8 | future: album art change in the media panel | n/a | Preventing a jarring change | Tens/day | cross-fade 200 ms, `standard`; the seek bar itself does not animate |
 | 9 | future: running timer ring | n/a | State indication | Occasional | constant motion, so `linear`, updated once per second; no easing |
 
-**Status (2026-09-30):** rows 1 to 6 are implemented; 7 to 9 belong to widgets that do not exist yet.
+**Status (2026-09-30):** rows 1 to 6 are implemented; 7 to 9 belong to widgets that do not exist yet. The popup is now the reusable `Popover` component (`components/Popover.qml`); the weather entry is its first user.
 
 Notes on values: hover and press stay at or below 160 ms because they occur tens of times a day. The
 popup slide at 700 ms is deliberately **over** the usual budget (200 to 500 ms for panels) and above the
