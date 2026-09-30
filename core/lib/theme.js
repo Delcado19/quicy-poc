@@ -4,7 +4,10 @@ var DEFAULTS = {
     colors: { bg: "#1e1e2e", fg: "#cdd6f4", accent: "#89b4fa", muted: "#6c7086", warning: "#f9e2af", critical: "#f38ba8" },
     font: { family: "sans", size: 12 },
     radius: 8,
-    spacing: 6
+    spacing: 6,
+    // Movement off: popups only fade instead of sliding (QML has no system-wide
+    // "reduce motion" flag to read, so it is a theme setting).
+    reduceMotion: false
 };
 
 function clone(o) { return JSON.parse(JSON.stringify(o)); }
@@ -69,6 +72,10 @@ function parseTheme(text) {
         if (isNum(raw[k], 0, 1000)) out.theme[k] = raw[k];
         else out.problems.push(k + " invalid: " + JSON.stringify(raw[k]));
     });
+    if (raw.reduceMotion !== undefined) {
+        if (typeof raw.reduceMotion === "boolean") out.theme.reduceMotion = raw.reduceMotion;
+        else out.problems.push("reduceMotion must be true or false");
+    }
     return out;
 }
 

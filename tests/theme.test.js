@@ -19,7 +19,7 @@ test("malformed JSON and non-object roots are fatal", () => {
 });
 
 test("a full valid theme is applied", () => {
-  const full = { colors: { bg: "#000000", fg: "#ffffff", accent: "#123456", muted: "#111111", warning: "#222222", critical: "#333333" }, font: { family: "Inter", size: 14 }, radius: 4, spacing: 2 };
+  const full = { colors: { bg: "#000000", fg: "#ffffff", accent: "#123456", muted: "#111111", warning: "#222222", critical: "#333333" }, font: { family: "Inter", size: 14 }, radius: 4, spacing: 2, reduceMotion: true };
   const r = T.parseTheme(JSON.stringify(full));
   assert.equal(r.fatal, false);
   assert.deepEqual(r.problems, []);
@@ -127,4 +127,17 @@ test("pickTheme with nothing usable returns last-good, else defaults", () => {
   assert.equal(T.pickTheme(["", undefined], last).theme.radius, 7);
   assert.deepEqual(T.pickTheme([], null).theme, T.DEFAULTS);
   assert.deepEqual(T.pickTheme(["", ""], null).theme, T.DEFAULTS);
+});
+
+test("reduceMotion defaults to false and accepts only booleans", () => {
+  assert.equal(T.DEFAULTS.reduceMotion, false);
+  const get = (v) => T.parseTheme(JSON.stringify({ reduceMotion: v }));
+  assert.equal(get(true).theme.reduceMotion, true);
+  assert.equal(get(false).theme.reduceMotion, false);
+  for (const bad of ["true", 1, 0, null, [], {}, "yes"]) {
+    const r = get(bad);
+    assert.equal(r.theme.reduceMotion, false, JSON.stringify(bad));
+    assert.equal(r.problems.length, 1, JSON.stringify(bad));
+  }
+  assert.equal(T.parseTheme("{}").theme.reduceMotion, false);
 });

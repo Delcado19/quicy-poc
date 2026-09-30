@@ -118,6 +118,28 @@ Item {
     readonly property string tooltipText: S.tooltipMarkup(value.tooltip)
     property bool showTip: false
 
+    // The popup slides up out of the bar edge and fades in. The slide is slow
+    // (Motion.spatialIn) and the fade fast, as in the reference shells, so the
+    // text is readable while the panel is still settling. A Behavior retargets
+    // from the current value, so moving the pointer in and out quickly reverses
+    // the motion instead of restarting it. Closing is quicker, same path.
+    property real slide: showTip ? 1 : 0
+    Behavior on slide {
+        NumberAnimation {
+            duration: Theme.reduceMotion ? 0 : (root.showTip ? Motion.spatialIn : Motion.spatialOut)
+            easing.type: Easing.BezierSpline
+            easing.bezierCurve: root.showTip ? Motion.emphasizedDecel : Motion.standard
+        }
+    }
+    property real fade: showTip ? 1 : 0
+    Behavior on fade {
+        NumberAnimation {
+            duration: Theme.reduceMotion ? Motion.reduced : (root.showTip ? Motion.effectsIn : Motion.effectsOut)
+            easing.type: Easing.BezierSpline
+            easing.bezierCurve: Motion.effects
+        }
+    }
+
     HoverHandler {
         id: hover
         onHoveredChanged: if (!hovered) root.showTip = false
@@ -130,7 +152,8 @@ Item {
     }
 
     PopupWindow {
-        visible: root.showTip && root.tooltipText !== ""
+        // Stays mapped while the closing animation runs.
+        visible: root.tooltipText !== "" && (root.showTip || root.slide > 0.001 || root.fade > 0.001)
         anchor.item: root
         anchor.rect.x: 0
         anchor.rect.y: 0
@@ -146,6 +169,11 @@ Item {
 
         Rectangle {
             id: tipBox
+            opacity: root.fade
+            // The popup window clips to its own area, whose bottom edge sits at
+            // the bar: sliding up from below reads as coming out of the bar.
+            // Reduced motion only fades.
+            y: Theme.reduceMotion ? 0 : (1 - root.slide) * Math.min(height, 200)
             width: Math.min(560, measure.implicitWidth) + 2 * Theme.spacing * 2
             height: tip.implicitHeight + 2 * Theme.spacing * 2
             radius: Theme.radius

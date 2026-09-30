@@ -18,6 +18,7 @@ Singleton {
     property real fontSize: T.DEFAULTS.font.size
     property real radius: T.DEFAULTS.radius
     property real spacing: T.DEFAULTS.spacing
+    property bool reduceMotion: T.DEFAULTS.reduceMotion
 
     property var _last: null
 
@@ -38,7 +39,7 @@ Singleton {
         bg = t.colors.bg; fg = t.colors.fg; accent = t.colors.accent;
         muted = t.colors.muted; warning = t.colors.warning; critical = t.colors.critical;
         fontFamily = t.font.family; fontSize = t.font.size;
-        radius = t.radius; spacing = t.spacing;
+        radius = t.radius; spacing = t.spacing; reduceMotion = t.reduceMotion;
     }
 
     function reload() {
