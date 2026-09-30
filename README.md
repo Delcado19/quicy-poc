@@ -60,6 +60,8 @@ A module is a folder `modules/<id>/` with a `module.json` and a `Module.qml`.
   and `required property var meta` (the parsed `module.json`). It can `import qs.core` (Theme) and
   `import qs.services`, also when it is loaded from the user directory.
 - Heavy work belongs in `Process`, never in the QML thread.
+- A module root item may declare two optional properties: `interactive: false` (no hover fill, for a pure
+  read-out) and `pressable: true` (a click does something, so pressing gives visual feedback).
 - Script modules (`weather`, ...) show the script's `tooltip` field in a popup while the pointer rests on
   the entry (after 250 ms, opening away from the bar edge). The text is reduced to `<b>`, `<i>`, `<u>` and
   line breaks (everything else, including markup from the internet, is shown as plain text) and capped at
@@ -68,6 +70,10 @@ A module is a folder `modules/<id>/` with a `module.json` and a `Module.qml`.
   pointer leaves. Durations and curves are tokens in `core/Motion.qml` (Material 3 easing, as used by
   Caelestia and DankMaterialShell for their bar popouts). `"reduceMotion": true` in the theme file
   replaces the slide with a short fade.
+- Other motion, all tokens in `core/Motion.qml`: a wallpaper or theme change cross-fades the bar's colours
+  (0.3 s); entries get a rounded hover fill (0.12 s in, 0.16 s out) and, if they react to clicks, a small
+  press effect; entries glide when a text changes width; modules added or removed by the layout or IPC grow
+  and fade in (0.2 s) or shrink and fade out (0.15 s) while the neighbours slide along.
 - The `battery` module shows a Nerd Font icon: battery with a bolt while charging, plain battery
   while discharging, a power plug when plugged in without charging (full or held by a charge limit).
   The icons are options in `modules/battery/module.json` (`options.symbols.charging|discharging|idle`,
@@ -140,7 +146,7 @@ verified live on Hyprland (see the plan and spec for the scenarios).
 
 ## Known limitations
 
-- Any layout change rebuilds all modules of all bars (a `weather` script runs again).
+- Reordering entries in the layout rebuilds the moved entry (adding and removing only touches the changed ones).
 - `module unload`/`load` does not pick up edited QML (Qt caches components); use `shell reload`.
 - A frozen QML thread (endless loop in a module) freezes the whole shell and cannot be attributed to
   a module. The PoC only avoids it by convention (heavy work in `Process`); an external watchdog

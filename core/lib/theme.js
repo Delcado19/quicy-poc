@@ -1,7 +1,9 @@
 .pragma library
 
 var DEFAULTS = {
-    colors: { bg: "#1e1e2e", fg: "#cdd6f4", accent: "#89b4fa", muted: "#6c7086", warning: "#f9e2af", critical: "#f38ba8" },
+    colors: { bg: "#1e1e2e", fg: "#cdd6f4", accent: "#89b4fa", muted: "#6c7086", warning: "#f9e2af", critical: "#f38ba8",
+        // Hover fill of bar entries; QML order (#AARRGGBB): white at about 12% alpha.
+        hover: "#1fffffff" },
     font: { family: "sans", size: 12 },
     radius: 8,
     spacing: 6,

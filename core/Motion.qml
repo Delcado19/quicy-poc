@@ -17,6 +17,19 @@ Singleton {
     // Used instead of the slide when Theme.reduceMotion is set.
     readonly property int reduced: 150
 
+    // Short interface feedback: things that happen tens of times a day stay quick.
+    readonly property int hoverIn: 120
+    readonly property int hoverOut: 160
+    readonly property int pressDown: 100
+    readonly property int pressUp: 160
+    readonly property real pressScale: 0.97
+    // Occasional state changes.
+    readonly property int colorFade: 300     // theme / wallpaper change
+    readonly property int layout: 200        // width of an entry, neighbours sliding
+    readonly property int enter: 200         // module appears
+    readonly property int exit: 150          // module disappears
+    readonly property real popupScale: 0.96  // popup grows from this size
+
     // Cubic-bezier control points as Qt wants them: x1, y1, x2, y2, 1, 1.
     readonly property var emphasizedDecel: [0.05, 0.7, 0.1, 1, 1, 1]  // enter
     readonly property var standard: [0.2, 0, 0, 1, 1, 1]              // exit

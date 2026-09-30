@@ -170,6 +170,10 @@ Item {
         Rectangle {
             id: tipBox
             opacity: root.fade
+            // Grows from the bar edge as well as sliding up (no overshoot: the popup
+            // window would clip it).
+            scale: Theme.reduceMotion ? 1 : Motion.popupScale + (1 - Motion.popupScale) * root.slide
+            transformOrigin: Item.Bottom
             // The popup window clips to its own area, whose bottom edge sits at
             // the bar: sliding up from below reads as coming out of the bar.
             // Reduced motion only fades.

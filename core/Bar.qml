@@ -21,28 +21,22 @@ PanelWindow {
     implicitHeight: Math.round(Theme.fontSize * 2 + Theme.spacing * 2)
     color: Theme.bg
 
-    Row {
-        anchors { left: parent.left; leftMargin: Theme.spacing; verticalCenter: parent.verticalCenter }
-        spacing: Theme.spacing
-        Repeater {
-            model: win.cfg.left
-            delegate: ModuleHost { required property string modelData; moduleId: modelData; screenRef: win.screen }
-        }
+    Zone {
+        ids: win.cfg.left
+        screenRef: win.screen
+        height: parent.height
+        anchors { left: parent.left; leftMargin: Theme.spacing / 2 }
     }
-    Row {
-        anchors { horizontalCenter: parent.horizontalCenter; verticalCenter: parent.verticalCenter }
-        spacing: Theme.spacing
-        Repeater {
-            model: win.cfg.center
-            delegate: ModuleHost { required property string modelData; moduleId: modelData; screenRef: win.screen }
-        }
+    Zone {
+        ids: win.cfg.center
+        screenRef: win.screen
+        height: parent.height
+        anchors.horizontalCenter: parent.horizontalCenter
     }
-    Row {
-        anchors { right: parent.right; rightMargin: Theme.spacing; verticalCenter: parent.verticalCenter }
-        spacing: Theme.spacing
-        Repeater {
-            model: win.cfg.right
-            delegate: ModuleHost { required property string modelData; moduleId: modelData; screenRef: win.screen }
-        }
+    Zone {
+        ids: win.cfg.right
+        screenRef: win.screen
+        height: parent.height
+        anchors { right: parent.right; rightMargin: Theme.spacing / 2 }
     }
 }

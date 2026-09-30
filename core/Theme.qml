@@ -14,6 +14,7 @@ Singleton {
     property color muted: T.DEFAULTS.colors.muted
     property color warning: T.DEFAULTS.colors.warning
     property color critical: T.DEFAULTS.colors.critical
+    property color hover: T.DEFAULTS.colors.hover
     property string fontFamily: T.DEFAULTS.font.family
     property real fontSize: T.DEFAULTS.font.size
     property real radius: T.DEFAULTS.radius
@@ -21,6 +22,24 @@ Singleton {
     property bool reduceMotion: T.DEFAULTS.reduceMotion
 
     property var _last: null
+    // Colours fade only once the first real theme is in; the start-up values
+    // themselves must not fade in from the built-in defaults.
+    property bool ready: false
+    property bool generatedDone: false
+
+    component Fade: ColorAnimation {
+        duration: root.reduceMotion ? 0 : Motion.colorFade
+        easing.type: Easing.BezierSpline
+        easing.bezierCurve: Motion.standard
+    }
+    // A wallpaper or theme change cross-fades the whole bar instead of jumping.
+    Behavior on bg { enabled: root.ready; Fade {} }
+    Behavior on fg { enabled: root.ready; Fade {} }
+    Behavior on accent { enabled: root.ready; Fade {} }
+    Behavior on muted { enabled: root.ready; Fade {} }
+    Behavior on warning { enabled: root.ready; Fade {} }
+    Behavior on critical { enabled: root.ready; Fade {} }
+    Behavior on hover { enabled: root.ready; Fade {} }
 
     function textOf(view) {
         try { return view.text(); } catch (e) { return ""; }
@@ -31,15 +50,16 @@ Singleton {
     function refresh() {
         // The shipped theme is the last fallback; deciding before it has been
         // read would log a misleading "no usable theme" during startup.
-        if (!shippedDone) return;
+        if (!shippedDone || !(generatedDone || Paths.stateDir === "")) return;
         var r = T.pickTheme([textOf(generated), textOf(shipped)], root._last);
         r.problems.forEach(function (p) { console.warn("[quicy] theme: " + p); });
         var t = r.theme;
         root._last = t;
         bg = t.colors.bg; fg = t.colors.fg; accent = t.colors.accent;
-        muted = t.colors.muted; warning = t.colors.warning; critical = t.colors.critical;
+        muted = t.colors.muted; warning = t.colors.warning; critical = t.colors.critical; hover = t.colors.hover;
         fontFamily = t.font.family; fontSize = t.font.size;
         radius = t.radius; spacing = t.spacing; reduceMotion = t.reduceMotion;
+        ready = true;
     }
 
     function reload() {
@@ -57,8 +77,8 @@ Singleton {
         // Verified with Quickshell 0.3.1: the watch survives replace-by-rename
         // writes (tmp file + mv), so no re-arming of watchChanges is needed.
         onFileChanged: reload()
-        onLoaded: { root.generatedOk = true; root.refresh(); }
-        onLoadFailed: { root.generatedOk = false; root.refresh(); }
+        onLoaded: { root.generatedOk = true; root.generatedDone = true; root.refresh(); }
+        onLoadFailed: { root.generatedOk = false; root.generatedDone = true; root.refresh(); }
     }
 
     FileWaiter {

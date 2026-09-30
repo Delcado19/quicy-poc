@@ -11,6 +11,10 @@ Item {
     implicitWidth: sv.implicitWidth
     implicitHeight: sv.implicitHeight
 
+    // A click fetches the weather again (Waybar: pkill -RTMIN+10 waybar).
+    readonly property bool pressable: true
+    TapHandler { onTapped: sv.refresh() }
+
     ScriptView {
         id: sv
         moduleId: root.moduleId

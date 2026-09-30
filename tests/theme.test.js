@@ -19,7 +19,7 @@ test("malformed JSON and non-object roots are fatal", () => {
 });
 
 test("a full valid theme is applied", () => {
-  const full = { colors: { bg: "#000000", fg: "#ffffff", accent: "#123456", muted: "#111111", warning: "#222222", critical: "#333333" }, font: { family: "Inter", size: 14 }, radius: 4, spacing: 2, reduceMotion: true };
+  const full = { colors: { bg: "#000000", fg: "#ffffff", accent: "#123456", muted: "#111111", warning: "#222222", critical: "#333333", hover: "#444444" }, font: { family: "Inter", size: 14 }, radius: 4, spacing: 2, reduceMotion: true };
   const r = T.parseTheme(JSON.stringify(full));
   assert.equal(r.fatal, false);
   assert.deepEqual(r.problems, []);
@@ -140,4 +140,16 @@ test("reduceMotion defaults to false and accepts only booleans", () => {
     assert.equal(r.problems.length, 1, JSON.stringify(bad));
   }
   assert.equal(T.parseTheme("{}").theme.reduceMotion, false);
+});
+
+test("hover is a colour token with a default and the same validation and alpha conversion as the others", () => {
+  assert.equal(T.DEFAULTS.colors.hover.startsWith("#"), true);
+  const hover = (v) => T.parseTheme(JSON.stringify({ colors: { hover: v } }));
+  assert.equal(hover("#7D504B66").theme.colors.hover, "#667D504B"); // CSS #RRGGBBAA to QML #AARRGGBB
+  assert.equal(hover("#123456").theme.colors.hover, "#123456");
+  for (const bad of ["red", "#12345", 5, null, ""]) {
+    const r = hover(bad);
+    assert.equal(r.theme.colors.hover, T.DEFAULTS.colors.hover, String(bad));
+    assert.equal(r.problems.length, 1);
+  }
 });

@@ -9,7 +9,7 @@ const TEMPLATE = path.join(__dirname, "..", "adapters", "hyde", "quicy.dcol");
 // wallbash derives the nine accents xa1..xa9 of every primary from that
 // primary's hue, so two primaries with similar hues yield identical accents.
 // This palette is a real one with exactly that property (1xa6 == 3xa6).
-const SAME_HUE = { pry1: "150A09", txt1: "FFFFFF", "1xa7": "E6A09A", "1xa8": "F0B0AA", "1xa6": "C2807A", "3xa6": "C2807A" };
+const SAME_HUE = { pry1: "150A09", txt1: "FFFFFF", "1xa7": "E6A09A", "1xa8": "F0B0AA", "1xa6": "C2807A", "3xa6": "C2807A", "4xa3": "7D504B" };
 
 function render(palette) {
   const body = fs.readFileSync(TEMPLATE, "utf8").split("\n").slice(1).join("\n"); // line 1 is "target|command"
@@ -85,4 +85,14 @@ test("the font matches the one waybar's global.css uses, at its size", () => {
   const t = T.parseTheme(render(SAME_HUE)).theme;
   assert.equal(t.font.family, "JetBrainsMono Nerd Font");
   assert.equal(t.font.size, 10);
+});
+
+test("the hover fill mirrors Waybar's wb-hvr-bg: a darker accent at 40% alpha", () => {
+  const c = T.parseTheme(render(SAME_HUE)).theme.colors;
+  assert.equal(c.hover, "#66" + SAME_HUE["4xa3"]);
+});
+
+test("the hover fill differs from the background so the fill is visible", () => {
+  const c = T.parseTheme(render(SAME_HUE)).theme.colors;
+  assert.notEqual(c.hover.slice(3).toLowerCase(), c.bg.slice(3).toLowerCase());
 });
