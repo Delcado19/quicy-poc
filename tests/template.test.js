@@ -68,3 +68,21 @@ test("warning (amber) and critical (red) are far apart in hue", () => {
   const dh = Math.abs(hsl(c.warning).h - hsl(c.critical).h);
   assert.ok(Math.min(dh, 360 - dh) >= 20, `hue distance ${dh.toFixed(0)}`);
 });
+
+test("bar background and text follow the HyDE waybar look (pry1 and 1xa8, both at 80% alpha)", () => {
+  const c = T.parseTheme(render(SAME_HUE)).theme.colors;
+  // theme.json uses CSS order (#RRGGBBAA); the parser hands QML its #AARRGGBB.
+  assert.equal(c.bg, "#CC" + SAME_HUE.pry1);
+  assert.equal(c.fg, "#CC" + SAME_HUE["1xa8"]);
+});
+
+test("the text colour is not the plain white txt1 of the palette", () => {
+  const c = T.parseTheme(render(SAME_HUE)).theme.colors;
+  assert.ok(!c.fg.toUpperCase().includes(SAME_HUE.txt1));
+});
+
+test("the font matches the one waybar's global.css uses, at its size", () => {
+  const t = T.parseTheme(render(SAME_HUE)).theme;
+  assert.equal(t.font.family, "JetBrainsMono Nerd Font");
+  assert.equal(t.font.size, 10);
+});

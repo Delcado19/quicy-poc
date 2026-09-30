@@ -31,7 +31,12 @@ Read from `~/.local/lib/hyde/color.set.sh` (HyDE, Sep 2026):
   and never creates it. That is why `install.sh` creates `~/.local/state/quicy`.
 - The rendered file is written with `mktemp` + `mv`, i.e. replace-by-rename. The theme watcher in
   `core/Theme.qml` was tested with exactly this write pattern.
-- Colour mapping: `pry1` background, `txt1` foreground, `1xa7` accent, `3xa6` muted, following the
+- Look: the bar mirrors Waybar's generated `~/.config/waybar/theme.css` (`main-bg`, `main-fg`) and its
+  `includes/global.css` font, so both bars match. `pry1` at 80% alpha is the background, `1xa8` at 80%
+  alpha the text, font `JetBrainsMono Nerd Font` at 10 px (Waybar's own, hard-coded in its CSS, not
+  derived from the HyDE theme; the theme's `$FONT` is the UI font of GTK/rofi). Because these colours
+  carry an alpha channel, the wallpaper shows through the bar as it does through Waybar's modules.
+- Other colours: `1xa7` accent, `3xa6` muted, following the
   existing wayle bridge in `~/.config/hyde/wallbash/scripts`. `warning` (amber `#F5A524`) and
   `critical` (red `#E5484D`) are fixed on purpose: wallbash derives the nine accents `xa1`..`xa9` of
   a primary from that primary's hue, so every palette-derived colour has the wallpaper's hue and,

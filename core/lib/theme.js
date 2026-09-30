@@ -10,6 +10,13 @@ var DEFAULTS = {
 function clone(o) { return JSON.parse(JSON.stringify(o)); }
 function isObj(v) { return v !== null && typeof v === "object" && !Array.isArray(v); }
 function isColor(v) { return typeof v === "string" && /^#([0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(v); }
+// theme.json uses CSS order (#RRGGBB or #RRGGBBAA, like Waybar and wallbash).
+// QML reads eight digits as #AARRGGBB, so the alpha byte has to move to the
+// front; without this "#F0B0AACC" becomes a see-through blue.
+function toQt(hex) {
+    return hex.length === 9 ? "#" + hex.slice(7) + hex.slice(1, 7) : hex;
+}
+
 function isNum(v, min, max) { return typeof v === "number" && isFinite(v) && v >= min && v <= max; }
 
 // Never throws: a bad theme must not take the shell down. Every invalid field
@@ -40,7 +47,7 @@ function parseTheme(text) {
         else Object.keys(DEFAULTS.colors).forEach(function (k) {
             var v = raw.colors[k];
             if (v === undefined) return;
-            if (isColor(v)) out.theme.colors[k] = v;
+            if (isColor(v)) out.theme.colors[k] = toQt(v);
             else out.problems.push("colors." + k + " invalid: " + JSON.stringify(v));
         });
     }

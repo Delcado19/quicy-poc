@@ -42,8 +42,13 @@ test("invalid colors fall back per field and are reported", () => {
   }
 });
 
-test("8-digit hex (alpha) is accepted", () => {
-  assert.equal(T.parseTheme('{"colors":{"bg":"#11223380"}}').theme.colors.bg, "#11223380");
+test("8-digit hex is CSS order #RRGGBBAA and is converted to QML's #AARRGGBB", () => {
+  const bg = (v) => T.parseTheme(JSON.stringify({ colors: { bg: v } })).theme.colors.bg;
+  assert.equal(bg("#11223380"), "#80112233");
+  assert.equal(bg("#150A09CC"), "#CC150A09");
+  assert.equal(bg("#aabbcc00"), "#00aabbcc"); // fully transparent stays transparent
+  assert.equal(bg("#aabbccFF"), "#FFaabbcc");
+  assert.equal(bg("#123456"), "#123456");     // 6 digits are untouched
 });
 
 test("font.size boundaries", () => {

@@ -106,7 +106,7 @@ reported and ignored, the shipped layout stays in effect.
 
 ## Theme
 
-`core/Theme.qml` reads a flat JSON file: six colours (`bg fg accent muted warning critical`), `font.family`,
+`core/Theme.qml` reads a flat JSON file (colours are `#RRGGBB` or `#RRGGBBAA` in CSS order, like Waybar and wallbash; the parser converts the alpha byte for QML): six colours (`bg fg accent muted warning critical`), `font.family`,
 `font.size`, `radius`, `spacing`. Every value has a default; invalid fields fall back individually and
 are logged. Sources in priority order: the generated file, `themes/example.json`, the defaults. A
 file caught mid-write keeps the last good theme. The watcher survives replace-by-rename writes
