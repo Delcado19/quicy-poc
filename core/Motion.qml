@@ -9,8 +9,8 @@ import QtQuick
 // popup moves the same way and the feel is tuned in one place.
 Singleton {
     // Spatial movement (slide). Opening decelerates gently, closing is quicker.
-    readonly property int spatialIn: 1000
-    readonly property int spatialOut: 650
+    readonly property int spatialIn: 700
+    readonly property int spatialOut: 450
     // Effects (fade) run faster than the movement so the panel is readable early.
     readonly property int effectsIn: 420
     readonly property int effectsOut: 350

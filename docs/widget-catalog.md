@@ -236,7 +236,7 @@ peeks and panels are occasional to tens a day.
 | 3 | entries that have a click action | none | Feedback | Tens/day | press: `scale 0.97` in 100 ms, release 160 ms, curve `standard`; only where a click does something (weather refresh); `reduceMotion`: no scale |
 | 4 | `ModuleHost` width | a changing text (battery 9 % to 10 %, weather text) makes the neighbours jump | Preventing a jarring change | Occasional | `Behavior on width`, 200 ms, curve `standard`; layout neighbours follow because their position derives from the width |
 | 5 | bar zones (module added or removed by layout or IPC) | modules appear and vanish, the rest jumps | Preventing a jarring change | Rare | enter: opacity 0 to 1 in 200 ms; exit: 1 to 0 in 150 ms; the remaining entries slide (`displaced`) in 200 ms; all curve `standard`. As a side effect only the changed modules are rebuilt |
-| 6 | peek / panel popup (`ScriptView`) | pure slide up | Spatial consistency | Occasional to tens/day | keep the slow slide the user chose (1000 ms open, 650 ms close) and add `scale 0.96 to 1` from the trigger edge, fade as now (420 / 350 ms). No overshoot: the popup window clips it and it repeats often |
+| 6 | peek / panel popup (`ScriptView`) | pure slide up | Spatial consistency | Occasional to tens/day | keep the slow slide the user chose (700 ms open, 450 ms close) and add `scale 0.96 to 1` from the trigger edge, fade as now (420 / 350 ms). No overshoot: the popup window clips it and it repeats often |
 | 7 | future: month change in the calendar | n/a | Spatial consistency | Occasional | month content slides 24 px and fades, 200 ms, `standard`; direction follows the scroll |
 | 8 | future: album art change in the media panel | n/a | Preventing a jarring change | Tens/day | cross-fade 200 ms, `standard`; the seek bar itself does not animate |
 | 9 | future: running timer ring | n/a | State indication | Occasional | constant motion, so `linear`, updated once per second; no easing |
@@ -244,8 +244,8 @@ peeks and panels are occasional to tens a day.
 **Status (2026-09-30):** rows 1 to 6 are implemented; 7 to 9 belong to widgets that do not exist yet.
 
 Notes on values: hover and press stay at or below 160 ms because they occur tens of times a day. The
-popup slide at 1000 ms is deliberately **over** the usual budget (200 to 500 ms for panels): it is the
-user's explicit choice, taken from the calm feel of the reference shells. Everything new uses the
+popup slide at 700 ms is deliberately **over** the usual budget (200 to 500 ms for panels) and above the
+reference shells' 500 ms: it is the user's explicit choice (first 1000 ms, then reduced to 700 ms). Everything new uses the
 budget.
 
 ### Part 2: Rejected

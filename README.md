@@ -66,7 +66,7 @@ A module is a folder `modules/<id>/` with a `module.json` and a `Module.qml`.
   the entry (after 250 ms, opening away from the bar edge). The text is reduced to `<b>`, `<i>`, `<u>` and
   line breaks (everything else, including markup from the internet, is shown as plain text) and capped at
   4000 characters and 40 lines. The popup slides up out of the bar edge while it fades in: the slide is slow
-  (1.0 s open, 0.65 s close), the fade faster (0.42 s / 0.35 s), and the motion reverses mid-way if the
+  (0.7 s open, 0.45 s close), the fade faster (0.42 s / 0.35 s), and the motion reverses mid-way if the
   pointer leaves. Durations and curves are tokens in `core/Motion.qml` (Material 3 easing, as used by
   Caelestia and DankMaterialShell for their bar popouts). `"reduceMotion": true` in the theme file
   replaces the slide with a short fade.
