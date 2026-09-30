@@ -21,7 +21,7 @@ from then on every wallpaper or theme change also writes `~/.local/state/quicy/t
 
 - Quickshell 0.3 or newer, Hyprland
 - `brightnessctl` (backlight module) and coreutils `timeout` (script modules, e.g. weather)
-- `hyde-shell` for the weather module (without it that module stays empty)
+- `curl` and network access for the weather module (it reads the place from `[weather] location` in `~/.config/hyde/config.toml`; without one, wttr.in guesses it from your IP address)
 - A Nerd Font for the battery icons and the Waybar-matching look: JetBrainsMono Nerd Font, which HyDE
   installs. Without it icons show as boxes; the battery note in the README's Modules section explains how to use plain text instead.
 
@@ -124,5 +124,5 @@ one, `install` at the one `uninstall.sh` uses.
 - Colours do not change: check that `~/.local/state/quicy/theme.json` exists and is valid JSON
   (`jq . ~/.local/state/quicy/theme.json`). wallbash silently skips a template whose target directory
   is missing; `install.sh` creates it.
-- Weather empty: run `hyde-shell weather` in a terminal to see what it prints.
+- Weather shows `Weather --` or `!`: check `curl -s "https://wttr.in/?format=j1" | head -c 200`; the panel names the reason.
 - Tests: `sh ~/.local/share/quicy/tests/run.sh` (needs Node.js and `qmlformat`).

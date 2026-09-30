@@ -50,7 +50,7 @@ tests/               node tests for the pure logic and the shell scripts
 A module is a folder `modules/<id>/` with a `module.json` and a `Module.qml`.
 
 ```json
-{"name": "weather", "api": 1, "options": {"command": ["hyde-shell", "weather"], "interval": 3600000}}
+{"name": "battery", "api": 1, "options": {"symbols": {"charging": "…", "discharging": "…", "idle": "…"}}}
 ```
 
 - `api` is the service API version the module was written against; the host is at version 1 and
@@ -62,10 +62,17 @@ A module is a folder `modules/<id>/` with a `module.json` and a `Module.qml`.
 - Heavy work belongs in `Process`, never in the QML thread.
 - A module root item may declare two optional properties: `interactive: false` (no hover fill, for a pure
   read-out) and `pressable: true` (a click does something, so pressing gives visual feedback).
-- Script modules (`weather`, ...) show the script's `tooltip` field in a popup while the pointer rests on
-  the entry (after 250 ms, opening away from the bar edge). The text is reduced to `<b>`, `<i>`, `<u>` and
+- `weather` fetches wttr.in itself once an hour (a click refreshes) for the place in `[weather] location` of
+  `~/.config/hyde/config.toml`, the same source HyDE's script uses, and shows a table in a popover: the current
+  conditions, then three days with high, low, sunrise and sunset and a row per 3-hour slot in aligned
+  columns (hour, icon, temperature, sky, clouds, rain, sun, wind, and rare events such as fog). Temperatures
+  are shown between -99 and 99 °C, percentages between 0 and 100 %, hours without a leading zero but aligned
+  as two-digit numbers. If the panel would be taller than the screen, later days are thinned to 6-hour rows;
+  today is never thinned. Only °C and km/h are supported for now.
+- Script modules (`components/ScriptView`) show the script's `tooltip` field in a popover while the pointer
+  rests on the entry (after 250 ms, opening away from the bar edge). The text is reduced to `<b>`, `<i>`, `<u>` and
   line breaks (everything else, including markup from the internet, is shown as plain text) and capped at
-  4000 characters and 40 lines. The popup slides up out of the bar edge while it fades in: the slide is slow
+  4000 characters and 40 lines. All popovers slide up out of the bar edge while it fades in: the slide is slow
   (0.7 s open, 0.45 s close), the fade faster (0.42 s / 0.35 s), and the motion reverses mid-way if the
   pointer leaves. Durations and curves are tokens in `core/Motion.qml` (Material 3 easing, as used by
   Caelestia and DankMaterialShell for their bar popouts). `"reduceMotion": true` in the theme file

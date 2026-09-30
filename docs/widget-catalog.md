@@ -79,6 +79,7 @@ Grouped; each could be added to a layout later.
   directly. *To verify:* whether `weather.py` can emit that structure itself, which would avoid a second
   network client.
 - **Actions:** click refreshes (as today; today via `pkill -RTMIN+10 waybar`).
+- **Status (2026-09-30): implemented.** `services/Weather.qml` fetches wttr.in, `core/lib/weather.js` formats the data (tested, including the -99 to 99 °C and 0 to 100 % ranges), `components/WeatherPanel.qml` lays it out in a grid. A design review against Apple's HIG added column headings, a larger type size and the height fit that thins later days on small screens.
 - **Reference shells:** Caelestia has a Weather tab (today, sunrise, sunset, humidity, feels like, forecast).
   DankMaterialShell offers current conditions, hourly, daily, sun/moon, humidity, wind, pressure,
   precipitation, visibility, UV, with a forecast/chart/cards switch and a refresh action.

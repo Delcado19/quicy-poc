@@ -1,0 +1,600 @@
+{
+ "current_condition": [
+  {
+   "FeelsLikeC": "21",
+   "cloudcover": "75",
+   "humidity": "42",
+   "temp_C": "24",
+   "weatherCode": "119",
+   "weatherDesc": [
+    {
+     "value": "Cloudy "
+    }
+   ],
+   "windspeedKmph": "11"
+  }
+ ],
+ "nearest_area": [
+  {
+   "areaName": [
+    {
+     "value": "Testville"
+    }
+   ],
+   "country": [
+    {
+     "value": "Nowhere"
+    }
+   ]
+  }
+ ],
+ "weather": [
+  {
+   "date": "2026-09-30",
+   "maxtempC": "27",
+   "mintempC": "17",
+   "astronomy": [
+    {
+     "sunrise": "07:25 AM",
+     "sunset": "07:06 PM"
+    }
+   ],
+   "hourly": [
+    {
+     "time": "0",
+     "tempC": "19",
+     "FeelsLikeC": "19",
+     "weatherCode": "122",
+     "weatherDesc": [
+      {
+       "value": "Overcast "
+      }
+     ],
+     "chanceoffog": "0",
+     "chanceoffrost": "0",
+     "chanceofovercast": "97",
+     "chanceofrain": "11",
+     "chanceofsnow": "0",
+     "chanceofsunshine": "0",
+     "chanceofthunder": "0",
+     "chanceofwindy": "1",
+     "windspeedKmph": "11",
+     "cloudcover": "97",
+     "humidity": "50"
+    },
+    {
+     "time": "300",
+     "tempC": "18",
+     "FeelsLikeC": "18",
+     "weatherCode": "122",
+     "weatherDesc": [
+      {
+       "value": "Overcast "
+      }
+     ],
+     "chanceoffog": "0",
+     "chanceoffrost": "0",
+     "chanceofovercast": "98",
+     "chanceofrain": "13",
+     "chanceofsnow": "0",
+     "chanceofsunshine": "0",
+     "chanceofthunder": "0",
+     "chanceofwindy": "1",
+     "windspeedKmph": "10",
+     "cloudcover": "99",
+     "humidity": "54"
+    },
+    {
+     "time": "600",
+     "tempC": "17",
+     "FeelsLikeC": "17",
+     "weatherCode": "122",
+     "weatherDesc": [
+      {
+       "value": "Overcast "
+      }
+     ],
+     "chanceoffog": "0",
+     "chanceoffrost": "0",
+     "chanceofovercast": "95",
+     "chanceofrain": "13",
+     "chanceofsnow": "0",
+     "chanceofsunshine": "0",
+     "chanceofthunder": "0",
+     "chanceofwindy": "1",
+     "windspeedKmph": "11",
+     "cloudcover": "93",
+     "humidity": "58"
+    },
+    {
+     "time": "900",
+     "tempC": "18",
+     "FeelsLikeC": "18",
+     "weatherCode": "122",
+     "weatherDesc": [
+      {
+       "value": "Overcast "
+      }
+     ],
+     "chanceoffog": "0",
+     "chanceoffrost": "0",
+     "chanceofovercast": "97",
+     "chanceofrain": "13",
+     "chanceofsnow": "0",
+     "chanceofsunshine": "0",
+     "chanceofthunder": "0",
+     "chanceofwindy": "1",
+     "windspeedKmph": "10",
+     "cloudcover": "97",
+     "humidity": "58"
+    },
+    {
+     "time": "1200",
+     "tempC": "24",
+     "FeelsLikeC": "25",
+     "weatherCode": "119",
+     "weatherDesc": [
+      {
+       "value": "Cloudy "
+      }
+     ],
+     "chanceoffog": "0",
+     "chanceoffrost": "0",
+     "chanceofovercast": "79",
+     "chanceofrain": "7",
+     "chanceofsnow": "0",
+     "chanceofsunshine": "4",
+     "chanceofthunder": "0",
+     "chanceofwindy": "1",
+     "windspeedKmph": "11",
+     "cloudcover": "75",
+     "humidity": "42"
+    },
+    {
+     "time": "1500",
+     "tempC": "27",
+     "FeelsLikeC": "26",
+     "weatherCode": "119",
+     "weatherDesc": [
+      {
+       "value": "Cloudy "
+      }
+     ],
+     "chanceoffog": "0",
+     "chanceoffrost": "0",
+     "chanceofovercast": "65",
+     "chanceofrain": "5",
+     "chanceofsnow": "0",
+     "chanceofsunshine": "7",
+     "chanceofthunder": "0",
+     "chanceofwindy": "1",
+     "windspeedKmph": "6",
+     "cloudcover": "68",
+     "humidity": "36"
+    },
+    {
+     "time": "1800",
+     "tempC": "25",
+     "FeelsLikeC": "26",
+     "weatherCode": "119",
+     "weatherDesc": [
+      {
+       "value": "Cloudy "
+      }
+     ],
+     "chanceoffog": "0",
+     "chanceoffrost": "0",
+     "chanceofovercast": "87",
+     "chanceofrain": "9",
+     "chanceofsnow": "0",
+     "chanceofsunshine": "3",
+     "chanceofthunder": "0",
+     "chanceofwindy": "1",
+     "windspeedKmph": "10",
+     "cloudcover": "82",
+     "humidity": "50"
+    },
+    {
+     "time": "2100",
+     "tempC": "20",
+     "FeelsLikeC": "20",
+     "weatherCode": "122",
+     "weatherDesc": [
+      {
+       "value": "Overcast "
+      }
+     ],
+     "chanceoffog": "0",
+     "chanceoffrost": "0",
+     "chanceofovercast": "94",
+     "chanceofrain": "12",
+     "chanceofsnow": "0",
+     "chanceofsunshine": "0",
+     "chanceofthunder": "0",
+     "chanceofwindy": "1",
+     "windspeedKmph": "10",
+     "cloudcover": "90",
+     "humidity": "58"
+    }
+   ]
+  },
+  {
+   "date": "2026-10-01",
+   "maxtempC": "22",
+   "mintempC": "14",
+   "astronomy": [
+    {
+     "sunrise": "07:27 AM",
+     "sunset": "07:04 PM"
+    }
+   ],
+   "hourly": [
+    {
+     "time": "0",
+     "tempC": "19",
+     "FeelsLikeC": "19",
+     "weatherCode": "119",
+     "weatherDesc": [
+      {
+       "value": "Cloudy "
+      }
+     ],
+     "chanceoffog": "0",
+     "chanceoffrost": "0",
+     "chanceofovercast": "58",
+     "chanceofrain": "9",
+     "chanceofsnow": "0",
+     "chanceofsunshine": "0",
+     "chanceofthunder": "0",
+     "chanceofwindy": "1",
+     "windspeedKmph": "9",
+     "cloudcover": "65",
+     "humidity": "62"
+    },
+    {
+     "time": "300",
+     "tempC": "19",
+     "FeelsLikeC": "19",
+     "weatherCode": "122",
+     "weatherDesc": [
+      {
+       "value": "Overcast "
+      }
+     ],
+     "chanceoffog": "0",
+     "chanceoffrost": "0",
+     "chanceofovercast": "98",
+     "chanceofrain": "15",
+     "chanceofsnow": "0",
+     "chanceofsunshine": "0",
+     "chanceofthunder": "0",
+     "chanceofwindy": "0",
+     "windspeedKmph": "4",
+     "cloudcover": "100",
+     "humidity": "62"
+    },
+    {
+     "time": "600",
+     "tempC": "19",
+     "FeelsLikeC": "19",
+     "weatherCode": "122",
+     "weatherDesc": [
+      {
+       "value": "Overcast "
+      }
+     ],
+     "chanceoffog": "0",
+     "chanceoffrost": "0",
+     "chanceofovercast": "98",
+     "chanceofrain": "15",
+     "chanceofsnow": "0",
+     "chanceofsunshine": "0",
+     "chanceofthunder": "0",
+     "chanceofwindy": "0",
+     "windspeedKmph": "6",
+     "cloudcover": "100",
+     "humidity": "61"
+    },
+    {
+     "time": "900",
+     "tempC": "18",
+     "FeelsLikeC": "18",
+     "weatherCode": "122",
+     "weatherDesc": [
+      {
+       "value": "Overcast "
+      }
+     ],
+     "chanceoffog": "0",
+     "chanceoffrost": "0",
+     "chanceofovercast": "98",
+     "chanceofrain": "17",
+     "chanceofsnow": "0",
+     "chanceofsunshine": "0",
+     "chanceofthunder": "0",
+     "chanceofwindy": "0",
+     "windspeedKmph": "4",
+     "cloudcover": "100",
+     "humidity": "68"
+    },
+    {
+     "time": "1200",
+     "tempC": "21",
+     "FeelsLikeC": "21",
+     "weatherCode": "122",
+     "weatherDesc": [
+      {
+       "value": "Overcast "
+      }
+     ],
+     "chanceoffog": "0",
+     "chanceoffrost": "0",
+     "chanceofovercast": "98",
+     "chanceofrain": "21",
+     "chanceofsnow": "0",
+     "chanceofsunshine": "0",
+     "chanceofthunder": "0",
+     "chanceofwindy": "1",
+     "windspeedKmph": "7",
+     "cloudcover": "100",
+     "humidity": "75"
+    },
+    {
+     "time": "1500",
+     "tempC": "22",
+     "FeelsLikeC": "25",
+     "weatherCode": "176",
+     "weatherDesc": [
+      {
+       "value": "Patchy rain nearby"
+      }
+     ],
+     "chanceoffog": "0",
+     "chanceoffrost": "0",
+     "chanceofovercast": "98",
+     "chanceofrain": "18",
+     "chanceofsnow": "0",
+     "chanceofsunshine": "0",
+     "chanceofthunder": "0",
+     "chanceofwindy": "0",
+     "windspeedKmph": "3",
+     "cloudcover": "100",
+     "humidity": "67"
+    },
+    {
+     "time": "1800",
+     "tempC": "20",
+     "FeelsLikeC": "20",
+     "weatherCode": "356",
+     "weatherDesc": [
+      {
+       "value": "Moderate or heavy rain shower"
+      }
+     ],
+     "chanceoffog": "4",
+     "chanceoffrost": "0",
+     "chanceofovercast": "98",
+     "chanceofrain": "83",
+     "chanceofsnow": "0",
+     "chanceofsunshine": "0",
+     "chanceofthunder": "0",
+     "chanceofwindy": "0",
+     "windspeedKmph": "5",
+     "cloudcover": "100",
+     "humidity": "83"
+    },
+    {
+     "time": "2100",
+     "tempC": "14",
+     "FeelsLikeC": "13",
+     "weatherCode": "353",
+     "weatherDesc": [
+      {
+       "value": "Light rain shower"
+      }
+     ],
+     "chanceoffog": "0",
+     "chanceoffrost": "0",
+     "chanceofovercast": "98",
+     "chanceofrain": "77",
+     "chanceofsnow": "0",
+     "chanceofsunshine": "0",
+     "chanceofthunder": "0",
+     "chanceofwindy": "2",
+     "windspeedKmph": "17",
+     "cloudcover": "100",
+     "humidity": "94"
+    }
+   ]
+  },
+  {
+   "date": "2026-10-02",
+   "maxtempC": "18",
+   "mintempC": "13",
+   "astronomy": [
+    {
+     "sunrise": "07:29 AM",
+     "sunset": "07:01 PM"
+    }
+   ],
+   "hourly": [
+    {
+     "time": "0",
+     "tempC": "14",
+     "FeelsLikeC": "14",
+     "weatherCode": "356",
+     "weatherDesc": [
+      {
+       "value": "Moderate or heavy rain shower"
+      }
+     ],
+     "chanceoffog": "4",
+     "chanceoffrost": "0",
+     "chanceofovercast": "98",
+     "chanceofrain": "91",
+     "chanceofsnow": "0",
+     "chanceofsunshine": "0",
+     "chanceofthunder": "0",
+     "chanceofwindy": "1",
+     "windspeedKmph": "9",
+     "cloudcover": "100",
+     "humidity": "97"
+    },
+    {
+     "time": "300",
+     "tempC": "14",
+     "FeelsLikeC": "13",
+     "weatherCode": "143",
+     "weatherDesc": [
+      {
+       "value": "Mist"
+      }
+     ],
+     "chanceoffog": "57",
+     "chanceoffrost": "0",
+     "chanceofovercast": "96",
+     "chanceofrain": "40",
+     "chanceofsnow": "0",
+     "chanceofsunshine": "0",
+     "chanceofthunder": "0",
+     "chanceofwindy": "1",
+     "windspeedKmph": "11",
+     "cloudcover": "96",
+     "humidity": "95"
+    },
+    {
+     "time": "600",
+     "tempC": "13",
+     "FeelsLikeC": "13",
+     "weatherCode": "143",
+     "weatherDesc": [
+      {
+       "value": "Mist"
+      }
+     ],
+     "chanceoffog": "57",
+     "chanceoffrost": "0",
+     "chanceofovercast": "98",
+     "chanceofrain": "38",
+     "chanceofsnow": "0",
+     "chanceofsunshine": "0",
+     "chanceofthunder": "0",
+     "chanceofwindy": "1",
+     "windspeedKmph": "7",
+     "cloudcover": "100",
+     "humidity": "95"
+    },
+    {
+     "time": "900",
+     "tempC": "13",
+     "FeelsLikeC": "13",
+     "weatherCode": "122",
+     "weatherDesc": [
+      {
+       "value": "Overcast "
+      }
+     ],
+     "chanceoffog": "0",
+     "chanceoffrost": "0",
+     "chanceofovercast": "94",
+     "chanceofrain": "28",
+     "chanceofsnow": "0",
+     "chanceofsunshine": "1",
+     "chanceofthunder": "0",
+     "chanceofwindy": "1",
+     "windspeedKmph": "7",
+     "cloudcover": "90",
+     "humidity": "91"
+    },
+    {
+     "time": "1200",
+     "tempC": "16",
+     "FeelsLikeC": "16",
+     "weatherCode": "176",
+     "weatherDesc": [
+      {
+       "value": "Patchy rain nearby"
+      }
+     ],
+     "chanceoffog": "0",
+     "chanceoffrost": "0",
+     "chanceofovercast": "88",
+     "chanceofrain": "19",
+     "chanceofsnow": "0",
+     "chanceofsunshine": "3",
+     "chanceofthunder": "0",
+     "chanceofwindy": "1",
+     "windspeedKmph": "8",
+     "cloudcover": "83",
+     "humidity": "77"
+    },
+    {
+     "time": "1500",
+     "tempC": "18",
+     "FeelsLikeC": "18",
+     "weatherCode": "176",
+     "weatherDesc": [
+      {
+       "value": "Patchy rain nearby"
+      }
+     ],
+     "chanceoffog": "0",
+     "chanceoffrost": "0",
+     "chanceofovercast": "97",
+     "chanceofrain": "23",
+     "chanceofsnow": "0",
+     "chanceofsunshine": "1",
+     "chanceofthunder": "0",
+     "chanceofwindy": "1",
+     "windspeedKmph": "7",
+     "cloudcover": "97",
+     "humidity": "67"
+    },
+    {
+     "time": "1800",
+     "tempC": "17",
+     "FeelsLikeC": "17",
+     "weatherCode": "119",
+     "weatherDesc": [
+      {
+       "value": "Cloudy "
+      }
+     ],
+     "chanceoffog": "0",
+     "chanceoffrost": "0",
+     "chanceofovercast": "90",
+     "chanceofrain": "17",
+     "chanceofsnow": "0",
+     "chanceofsunshine": "2",
+     "chanceofthunder": "0",
+     "chanceofwindy": "0",
+     "windspeedKmph": "4",
+     "cloudcover": "86",
+     "humidity": "73"
+    },
+    {
+     "time": "2100",
+     "tempC": "16",
+     "FeelsLikeC": "16",
+     "weatherCode": "119",
+     "weatherDesc": [
+      {
+       "value": "Cloudy "
+      }
+     ],
+     "chanceoffog": "0",
+     "chanceoffrost": "0",
+     "chanceofovercast": "90",
+     "chanceofrain": "17",
+     "chanceofsnow": "0",
+     "chanceofsunshine": "0",
+     "chanceofthunder": "0",
+     "chanceofwindy": "0",
+     "windspeedKmph": "3",
+     "cloudcover": "86",
+     "humidity": "73"
+    }
+   ]
+  }
+ ]
+}
