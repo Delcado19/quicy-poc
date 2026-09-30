@@ -1,1 +1,3 @@
 .run/
+# Local scratch of the executing tooling; never belongs in the repository.
+.superpowers/

@@ -1,0 +1,14 @@
+# Tracked files that add noise to a knowledge graph. Scratch and generated
+# paths (.run/, .superpowers/) are covered by .gitignore, which graphify merges.
+
+# The implementation plan is ~90 KB of step-by-step instructions whose code
+# blocks duplicate the real sources, so every function would appear twice.
+# The design spec (docs/specs/) and README stay: they hold the intent.
+docs/plans/
+
+# Throw-away modules used only as test input (demo-*, import-probe). They
+# repeat the shape of the real modules and would show up as extra nodes.
+tests/fixtures/
+
+# graphify's own output, if it is written into the project directory.
+graphify-out/
