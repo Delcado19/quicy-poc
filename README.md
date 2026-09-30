@@ -60,6 +60,10 @@ A module is a folder `modules/<id>/` with a `module.json` and a `Module.qml`.
   and `required property var meta` (the parsed `module.json`). It can `import qs.core` (Theme) and
   `import qs.services`, also when it is loaded from the user directory.
 - Heavy work belongs in `Process`, never in the QML thread.
+- Script modules (`weather`, ...) show the script's `tooltip` field in a popup while the pointer rests on
+  the entry (after 250 ms, opening away from the bar edge). The text is reduced to `<b>`, `<i>`, `<u>` and
+  line breaks (everything else, including markup from the internet, is shown as plain text) and capped at
+  4000 characters and 40 lines.
 - The `battery` module shows a Nerd Font icon: battery with a bolt while charging, plain battery
   while discharging, a power plug when plugged in without charging (full or held by a charge limit).
   The icons are options in `modules/battery/module.json` (`options.symbols.charging|discharging|idle`,

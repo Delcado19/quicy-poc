@@ -91,3 +91,41 @@ test("exitNote reports a run that produced no valid line", () => {
   assert.match(S.exitNote(false, undefined), /no output/);
   assert.match(S.exitNote(false, 124), /timed out/);
 });
+
+test("tooltipMarkup: plain text and line breaks", () => {
+  assert.equal(S.tooltipMarkup("plain"), "plain");
+  assert.equal(S.tooltipMarkup("a\nb"), "a<br/>b");
+  assert.equal(S.tooltipMarkup("a\r\nb\rc"), "a<br/>b<br/>c");
+});
+
+test("tooltipMarkup keeps only b, i, u and br tags", () => {
+  assert.equal(S.tooltipMarkup("<b>Overcast  21°C</b>\nFeels like: 19°C"), "<b>Overcast  21°C</b><br/>Feels like: 19°C");
+  assert.equal(S.tooltipMarkup("<i>x</i><u>y</u><br>z<br/>w"), "<i>x</i><u>y</u><br/>z<br/>w");
+  assert.equal(S.tooltipMarkup("<B>loud</B>"), "<b>loud</b>");
+});
+
+test("tooltipMarkup escapes every other tag, also tags with attributes", () => {
+  assert.equal(S.tooltipMarkup('<a href="x">y</a>'), '&lt;a href="x"&gt;y&lt;/a&gt;');
+  assert.equal(S.tooltipMarkup('<b onclick="x">y</b>'), '&lt;b onclick="x"&gt;y</b>');
+  assert.equal(S.tooltipMarkup("<script>alert(1)</script>"), "&lt;script&gt;alert(1)&lt;/script&gt;");
+  assert.equal(S.tooltipMarkup("<img src=x>"), "&lt;img src=x&gt;");
+});
+
+test("tooltipMarkup escapes bare < > & but keeps real entities", () => {
+  assert.equal(S.tooltipMarkup("a < b & c > d"), "a &lt; b &amp; c &gt; d");
+  assert.equal(S.tooltipMarkup("Tom &amp; Jerry &lt;3 &#176; &#x00B0;"), "Tom &amp; Jerry &lt;3 &#176; &#x00B0;");
+  assert.equal(S.tooltipMarkup("&nosuch; & &"), "&amp;nosuch; &amp; &amp;");
+});
+
+test("tooltipMarkup: empty, non-string and whitespace-only input give an empty string", () => {
+  for (const v of ["", "   ", "\n\n", undefined, null, 5, {}, []]) assert.equal(S.tooltipMarkup(v), "", String(v));
+});
+
+test("tooltipMarkup caps length and number of lines", () => {
+  const long = S.tooltipMarkup("x".repeat(10000));
+  assert.ok(long.length <= 4001 && long.endsWith("…"));
+  const many = S.tooltipMarkup(Array.from({ length: 100 }, (_, i) => "l" + i).join("\n"));
+  assert.equal(many.split("<br/>").length, 41); // 40 lines plus the ellipsis line
+  assert.ok(many.endsWith("…"));
+  assert.equal(S.tooltipMarkup("x".repeat(4000)), "x".repeat(4000)); // exactly at the limit is untouched
+});

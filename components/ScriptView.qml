@@ -1,3 +1,4 @@
+import Quickshell
 import Quickshell.Io
 import QtQuick
 import qs.core
@@ -33,6 +34,10 @@ Item {
 
     implicitWidth: label.implicitWidth
     implicitHeight: label.implicitHeight
+    // An Item does not size itself to its implicit size. Without a real area the
+    // hover handler never fires and the popup anchor rectangle is empty.
+    width: implicitWidth
+    height: implicitHeight
 
     function refresh() {
         if (command.length === 0) return;
@@ -105,6 +110,73 @@ Item {
     Connections {
         target: Ipc
         function onRefreshRequested(id) { if (id === root.moduleId) root.refresh(); }
+    }
+
+    // Hover tooltip: the script's "tooltip" field, shown in a popup next to the
+    // entry (Waybar shows the same field). Shown after a short delay so sweeping
+    // the pointer across the bar does not flash popups.
+    readonly property string tooltipText: S.tooltipMarkup(value.tooltip)
+    property bool showTip: false
+
+    HoverHandler {
+        id: hover
+        onHoveredChanged: if (!hovered) root.showTip = false
+    }
+
+    Timer {
+        interval: 250
+        running: hover.hovered && root.tooltipText !== "" && !root.showTip
+        onTriggered: root.showTip = true
+    }
+
+    PopupWindow {
+        visible: root.showTip && root.tooltipText !== ""
+        anchor.item: root
+        anchor.rect.x: 0
+        anchor.rect.y: 0
+        anchor.rect.width: root.width
+        anchor.rect.height: root.height
+        // Open away from the bar edge; Flip turns it around if there is no room.
+        anchor.edges: Edges.Top
+        anchor.gravity: Edges.Top
+        anchor.adjustment: PopupAdjustment.Flip | PopupAdjustment.Slide
+        implicitWidth: tipBox.width
+        implicitHeight: tipBox.height
+        color: "transparent"
+
+        Rectangle {
+            id: tipBox
+            width: Math.min(560, measure.implicitWidth) + 2 * Theme.spacing * 2
+            height: tip.implicitHeight + 2 * Theme.spacing * 2
+            radius: Theme.radius
+            // Near-opaque: the bar's own background lets the wallpaper shine through.
+            color: Qt.rgba(Theme.bg.r, Theme.bg.g, Theme.bg.b, 0.96)
+            border.width: 1
+            border.color: Qt.rgba(Theme.fg.r, Theme.fg.g, Theme.fg.b, 0.25)
+
+            // Same text without wrapping, only to learn its natural width.
+            Text {
+                id: measure
+                visible: false
+                text: root.tooltipText
+                textFormat: Text.StyledText
+                font.family: Theme.fontFamily
+                font.pixelSize: Theme.fontSize
+            }
+
+            Text {
+                id: tip
+                x: Theme.spacing * 2
+                y: Theme.spacing * 2
+                width: parent.width - 4 * Theme.spacing
+                text: root.tooltipText
+                textFormat: Text.StyledText
+                wrapMode: Text.Wrap
+                color: Theme.fg
+                font.family: Theme.fontFamily
+                font.pixelSize: Theme.fontSize
+            }
+        }
     }
 
     Text {

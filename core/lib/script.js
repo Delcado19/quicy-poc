@@ -77,4 +77,29 @@ function exitNote(gotLine, code) {
     return "no output";
 }
 
-if (typeof module !== "undefined") module.exports = { parseScriptLine: parseScriptLine, lastLine: lastLine, nextBackoff: nextBackoff, restartPlan: restartPlan, clampInterval: clampInterval, exitNote: exitNote };
+var MAX_TIP_CHARS = 4000;
+var MAX_TIP_LINES = 40;
+
+// Scripts print Pango-style tooltips (<b>, newlines). The text may contain
+// data from the internet (weather location names), so it is turned into
+// StyledText markup that only allows b, i, u and line breaks: every other tag
+// is shown as text, real entities (&amp; &#176;) survive, a bare & < > is
+// escaped. Length and line count are capped so a runaway script cannot build
+// a screen-sized popup.
+function tooltipMarkup(text) {
+    if (typeof text !== "string" || text.trim() === "") return "";
+    var t = text.replace(/\r\n?/g, "\n").replace(/\s+$/, "");
+    if (t.length > MAX_TIP_CHARS) t = t.slice(0, MAX_TIP_CHARS) + "\u2026";
+    var lines = t.split("\n");
+    if (lines.length > MAX_TIP_LINES) t = lines.slice(0, MAX_TIP_LINES).join("\n") + "\n\u2026";
+    return t.replace(/<\/?(?:b|i|u)>|<br\s*\/?>|&(?:amp|lt|gt|quot|apos|#\d+|#x[0-9a-fA-F]+);|[<>&]|\n/gi, function (m) {
+        if (m === "\n") return "<br/>";
+        if (m === "<") return "&lt;";
+        if (m === ">") return "&gt;";
+        if (m === "&") return "&amp;";
+        if (m.charAt(0) === "&") return m;
+        return /^<br/i.test(m) ? "<br/>" : m.toLowerCase();
+    });
+}
+
+if (typeof module !== "undefined") module.exports = { parseScriptLine: parseScriptLine, lastLine: lastLine, nextBackoff: nextBackoff, restartPlan: restartPlan, clampInterval: clampInterval, exitNote: exitNote, tooltipMarkup: tooltipMarkup };
