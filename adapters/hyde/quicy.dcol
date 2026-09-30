@@ -5,7 +5,7 @@ ${HOME}/.local/state/quicy/theme.json|
     "fg": "#<wallbash_txt1>",
     "accent": "#<wallbash_1xa7>",
     "muted": "#<wallbash_3xa6>",
-    "warning": "#<wallbash_1xa6>",
+    "warning": "#F5A524",
     "critical": "#<wallbash_1xa8>"
   },
   "font": { "family": "sans", "size": 12 },

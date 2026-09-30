@@ -31,8 +31,13 @@ Read from `~/.local/lib/hyde/color.set.sh` (HyDE, Sep 2026):
   and never creates it. That is why `install.sh` creates `~/.local/state/quicy`.
 - The rendered file is written with `mktemp` + `mv`, i.e. replace-by-rename. The theme watcher in
   `core/Theme.qml` was tested with exactly this write pattern.
-- The colour mapping follows the existing wayle bridge in `~/.config/hyde/wallbash/scripts`:
-  `pry1` background, `txt1` foreground, `1xa7` accent, `3xa6` muted, `1xa6` warning, `1xa8` critical.
+- Colour mapping: `pry1` background, `txt1` foreground, `1xa7` accent, `3xa6` muted, `1xa8` critical,
+  following the existing wayle bridge in `~/.config/hyde/wallbash/scripts`. `warning` is a fixed
+  amber (`#F5A524`) on purpose: wallbash derives the nine accents `xa1`..`xa9` of a primary from that
+  primary's hue, so every palette-derived colour has the wallpaper's hue and, with similar primaries,
+  even the same value (`1xa6` and `3xa6` were both `#C2807A`). A warning must not depend on the
+  wallpaper to stay recognisable. `critical` is still palette-derived (see the note in this file's
+  "Open points").
 
 ## Starting the shell from HyDE
 
@@ -51,8 +56,17 @@ This snippet is **not applied automatically**. It assumes the shell tree is inst
 part. Back up `config.toml` with `hyde-backup.sh` before editing it, and note that Waybar keeps
 running until the default `bar` entry is replaced.
 
-## Not yet verified
+## Open points
 
-A real wallbash run with the template has not been executed against the live HyDE install (it
-needs a backup and your go-ahead first). Until then the template format is verified only by
-reading `color.set.sh`.
+- `critical` (`1xa8`) is a light tint of the wallpaper hue and can look less alarming than `warning`; a fixed red would fix that. Not changed yet.
+
+## Verified against the live install (2026-09-30)
+
+`hyde-shell color.set.sh --single ~/.config/hyde/wallbash/always/quicy.dcol` rendered the template
+through the real pipeline: valid JSON in `~/.local/state/quicy/theme.json` (written with `mktemp` +
+`mv`), and the bar picked it up. Caveats:
+
+- Even `--single` first runs wallbash's kdeglobals/Kvantum/dconf step and reloads Hyprland, so back
+  those up before running it by hand. On the tested machine they were byte-identical afterwards.
+- `--dcol <other palette>` does not change the rendered colours with `--single` (the substitutions
+  are prepared before the override is read), so it cannot be used to force a visible colour change.
