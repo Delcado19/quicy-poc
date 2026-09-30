@@ -6,20 +6,26 @@ about wallbash.
 | File | Purpose |
 |---|---|
 | `quicy.dcol` | wallbash template that writes `~/.local/state/quicy/theme.json` on every wallpaper/theme change |
-| `install.sh` | Backs up what it touches, creates the state directory, copies the template into `~/.config/hyde/wallbash/always/` |
+| `install.sh` | Backs up what it touches (template path, kdeglobals, Kvantum config, dconf), creates the state directory, copies the template into `~/.config/hyde/wallbash/always/` |
+| `uninstall.sh` | Restores that backup and removes the generated theme (and its directory if empty) |
 | `hyde-backup.sh` | Saves files under `$HOME` and writes a `restore.sh` next to the copies |
 
 ## Install and undo
 
 ```sh
-sh adapters/hyde/install.sh
-# undo, one command:
-sh ~/.local/share/quicy-backups/latest/restore.sh
+sh adapters/hyde/install.sh      # saves what it touches, then installs the template
+sh adapters/hyde/uninstall.sh    # restores the saved state and removes the generated theme
 ```
 
-`hyde-backup.sh` accepts regular files and symlinks under `$HOME` only (never directories, never
-paths with `..`). A file that did not exist before is recorded as absent, so restoring deletes it
-again. Restoring leaves the (empty) state directory `~/.local/state/quicy` in place.
+`install.sh` saves, through `hyde-backup.sh --dconf`, the template path, `~/.config/kdeglobals`,
+`~/.config/Kvantum/wallbash/wallbash.kvconfig` (everything a wallbash render rewrites) and a dconf dump.
+The backup lives in `~/.local/share/quicy-backups/<timestamp>/`; `install` points to the one made by the
+first install (used by `uninstall.sh`), `latest` to the most recent of any backup.
+
+`hyde-backup.sh` accepts regular files and symlinks under `$HOME` only (never directories, never paths
+with `..`). A file that did not exist before is recorded as absent, so restoring deletes it again.
+`dconf load` merges, so settings created after the backup stay. See [INSTALL.md](../../INSTALL.md) for
+the whole procedure.
 
 ## How wallbash treats the template
 

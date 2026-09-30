@@ -123,8 +123,10 @@ yet.
 
 ## HyDE
 
-See `adapters/hyde/README.md`. Short version: `sh adapters/hyde/install.sh` (backs up first; undo with
-`sh ~/.local/share/quicy-backups/latest/restore.sh`).
+Step-by-step instructions, including the backup and how to return to your original HyDE state, are in
+[INSTALL.md](INSTALL.md). Short version: `sh adapters/hyde/install.sh` saves what it touches first, and
+`sh adapters/hyde/uninstall.sh` puts everything back. Details of the wallbash template are in
+`adapters/hyde/README.md`.
 
 ## Tests
 
@@ -150,7 +152,7 @@ verified live on Hyprland (see the plan and spec for the scenarios).
 - Stream output without newlines is buffered without limit.
 - Only one monitor was available for testing; per-monitor overrides were exercised through the
   monitor's own `screens` entry.
-- A real wallbash run with the template has not been executed against the live HyDE install.
+- Tested on one machine only (Arch, Hyprland 0.56, Quickshell 0.3.1, one monitor). The bar was started by hand; the `[desktop.start]` autostart entry is documented but untested.
 
 ## Open questions for the QuiCy discussion
 
@@ -159,3 +161,7 @@ verified live on Hyprland (see the plan and spec for the scenarios).
 - How to attribute a frozen QML thread to one module.
 - Whether module folders should be autoloaded (`autoload` + `slot` in `module.json`); not built.
 - `type: "window"` modules (standalone widgets) are reserved in `module.json` but not implemented.
+
+## License
+
+MIT, see [LICENSE](LICENSE).

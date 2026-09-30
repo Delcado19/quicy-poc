@@ -3,14 +3,20 @@
 # writes a restore.sh next to the copies. Files that do not exist yet are
 # recorded as "absent": restoring deletes them again.
 #
-#   sh hyde-backup.sh FILE...
+#   sh hyde-backup.sh [--dconf] FILE...
 #   sh ~/.local/share/quicy-backups/latest/restore.sh     # undo
+#
+# With --dconf the dconf database is dumped too and restored with `dconf load`
+# (which merges: keys created after the backup are not removed). If dconf is not
+# installed, the files are still saved and a warning is printed.
 #
 # Only regular files and symlinks are supported; directories are refused so a
 # restore can never delete or overwrite a whole tree.
 set -eu
 
-[ $# -gt 0 ] || { echo "usage: $0 FILE..." >&2; exit 2; }
+want_dconf=0
+if [ "${1:-}" = "--dconf" ]; then want_dconf=1; shift; fi
+[ $# -gt 0 ] || { echo "usage: $0 [--dconf] FILE..." >&2; exit 2; }
 [ -n "${HOME:-}" ] || { echo "HOME is not set" >&2; exit 2; }
 
 # Single-quote a string for the generated script.
@@ -61,6 +67,15 @@ for f in "$@"; do
     printf 'if [ -f %s ] || [ -L %s ]; then rm -f %s; fi\n' "$(q "$f")" "$(q "$f")" "$(q "$f")" >> "$restore"
   fi
 done
+
+if [ "$want_dconf" = 1 ]; then
+  if command -v dconf >/dev/null 2>&1 && dconf dump / > "$dir/dconf.ini" 2>/dev/null; then
+    printf '%s\n' 'if command -v dconf >/dev/null 2>&1; then dconf load / < "$(dirname "$0")/dconf.ini"; else echo "dconf not found, settings not restored" >&2; fi' >> "$restore"
+  else
+    rm -f "$dir/dconf.ini"
+    echo "warning: dconf is not available, desktop settings are not part of this backup" >&2
+  fi
+fi
 
 chmod +x "$restore"
 ln -sfn "$dir" "$root/latest"

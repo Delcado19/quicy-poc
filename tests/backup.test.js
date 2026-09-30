@@ -150,3 +150,46 @@ test("a regular file at the backup root fails fast", () => {
   assert.equal(r.error, undefined, "must not hang");
   assert.notEqual(r.status, 0);
 });
+
+const { fakeHome: fakeHome2 } = require("./helpers");
+
+test("--dconf saves a dump next to the files and restore loads it back", () => {
+  const { home, env, db } = fakeHome2();
+  const f = path.join(home, "f");
+  fs.writeFileSync(f, "1");
+  fs.writeFileSync(db, "[a]\nx=1\n");
+  const r = run(env, "--dconf", f);
+  assert.equal(r.status, 0, r.stderr);
+  fs.writeFileSync(db, "[a]\nx=CHANGED\n");
+  assert.equal(doRestore(env, home).status, 0);
+  assert.equal(fs.readFileSync(db, "utf8"), "[a]\nx=1\n");
+});
+
+test("--dconf without dconf installed still backs up the files and warns", () => {
+  const { home, env } = fakeHome2({ dconf: false });
+  const f = path.join(home, "f");
+  fs.writeFileSync(f, "1");
+  const r = run(env, "--dconf", f);
+  assert.equal(r.status, 0, r.stderr);
+  assert.match(r.stderr, /dconf/);
+  fs.writeFileSync(f, "2");
+  assert.equal(doRestore(env, home).status, 0);
+  assert.equal(fs.readFileSync(f, "utf8"), "1");
+});
+
+test("a restore that has a dconf dump still works when dconf has disappeared", () => {
+  const { home, env } = fakeHome2();
+  const f = path.join(home, "f");
+  fs.writeFileSync(f, "1");
+  run(env, "--dconf", f);
+  fs.writeFileSync(f, "2");
+  fs.rmSync(path.join(home, "fakebin/dconf"));
+  assert.equal(doRestore(env, home).status, 0);
+  assert.equal(fs.readFileSync(f, "utf8"), "1");
+});
+
+test("--dconf alone, without any file, is refused", () => {
+  const { env, home } = fakeHome2();
+  assert.notEqual(run(env, "--dconf").status, 0);
+  assert.equal(fs.existsSync(path.join(home, ".local/share/quicy-backups")), false);
+});

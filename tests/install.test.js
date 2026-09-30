@@ -55,6 +55,56 @@ test("running install twice keeps the first backup restorable to the original st
   const { home, env } = fakeHome();
   run(env);
   run(env);
-  const dirs = fs.readdirSync(path.join(home, ".local/share/quicy-backups")).filter((d) => d !== "latest");
+  const dirs = fs.readdirSync(path.join(home, ".local/share/quicy-backups")).filter((d) => d !== "latest" && d !== "install");
   assert.equal(dirs.length, 2);
+});
+
+const { fakeHome: fh, sh: shx, restoreLatest } = require("./helpers");
+
+function prepared() {
+  const h = fh();
+  fs.mkdirSync(path.join(h.home, ".config/Kvantum/wallbash"), { recursive: true });
+  fs.writeFileSync(path.join(h.home, ".config/kdeglobals"), "kde original\n");
+  fs.writeFileSync(path.join(h.home, ".config/Kvantum/wallbash/wallbash.kvconfig"), "kv original\n");
+  fs.writeFileSync(h.db, "[org/test]\nvalue=ORIGINAL\n");
+  return h;
+}
+
+test("install also saves kdeglobals, the Kvantum config and dconf, and restore brings all back", () => {
+  const { home, env, db } = prepared();
+  assert.equal(shx("install.sh", env).status, 0);
+  fs.writeFileSync(path.join(home, ".config/kdeglobals"), "kde changed by wallbash\n");
+  fs.writeFileSync(path.join(home, ".config/Kvantum/wallbash/wallbash.kvconfig"), "kv changed\n");
+  fs.writeFileSync(db, "[org/test]\nvalue=CHANGED\n");
+  assert.equal(restoreLatest(env, home).status, 0);
+  assert.equal(fs.readFileSync(path.join(home, ".config/kdeglobals"), "utf8"), "kde original\n");
+  assert.equal(fs.readFileSync(path.join(home, ".config/Kvantum/wallbash/wallbash.kvconfig"), "utf8"), "kv original\n");
+  assert.equal(fs.readFileSync(db, "utf8"), "[org/test]\nvalue=ORIGINAL\n");
+  assert.equal(fs.existsSync(path.join(home, ".config/hyde/wallbash/always/quicy.dcol")), false);
+});
+
+test("install works when those extra files do not exist and restore then removes what appeared", () => {
+  const { home, env } = fh();
+  assert.equal(shx("install.sh", env).status, 0);
+  fs.writeFileSync(path.join(home, ".config/kdeglobals"), "created later\n");
+  assert.equal(restoreLatest(env, home).status, 0);
+  assert.equal(fs.existsSync(path.join(home, ".config/kdeglobals")), false);
+});
+
+test("install keeps a fixed 'install' link to its own backup even when a later backup moves 'latest'", () => {
+  const { home, env } = prepared();
+  shx("install.sh", env);
+  const later = path.join(home, "later.conf");
+  fs.writeFileSync(later, "x");
+  shx("hyde-backup.sh", env, later);
+  const root = path.join(home, ".local/share/quicy-backups");
+  assert.notEqual(fs.realpathSync(path.join(root, "latest")), fs.realpathSync(path.join(root, "install")));
+  assert.ok(fs.existsSync(path.join(root, "install", "restore.sh")));
+});
+
+test("install without dconf still succeeds and says so", () => {
+  const { env } = (() => { const h = fh({ dconf: false }); return h; })();
+  const r = shx("install.sh", env);
+  assert.equal(r.status, 0);
+  assert.match(r.stderr, /dconf/);
 });
