@@ -10,6 +10,10 @@ Singleton {
     readonly property var dev: UPower.displayDevice
     readonly property bool available: dev !== null && dev !== undefined && dev.isPresent
     readonly property int percent: available ? Math.round(dev.percentage * 100) : 0
-    readonly property bool charging: available && (dev.state === UPowerDeviceState.Charging || dev.state === UPowerDeviceState.FullyCharged)
+    // Only real charging counts: "fully charged" and "pending charge" (a charge
+    // limit holding the battery back) are plugged-in states without a charge.
+    readonly property bool charging: available && dev.state === UPowerDeviceState.Charging
+    readonly property bool discharging: available && dev.state === UPowerDeviceState.Discharging
+    readonly property string kind: B.kindFor(charging, discharging)
     readonly property string state: available ? B.stateFor(percent, charging) : "normal"
 }

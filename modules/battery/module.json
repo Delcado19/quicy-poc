@@ -1,1 +1,1 @@
-{"name":"battery","api":1}
+{"name":"battery","api":1,"options":{"symbols":{"charging":"\udb80\udc84","discharging":"\udb80\udc79","idle":"\udb81\udea5"}}}

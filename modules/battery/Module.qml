@@ -1,6 +1,7 @@
 import QtQuick
 import qs.core
 import qs.services
+import "../../core/lib/battery.js" as B
 
 Item {
     id: root
@@ -15,7 +16,7 @@ Item {
 
     Text {
         id: label
-        text: (Battery.charging ? "+" : "") + Battery.percent + "%"
+        text: B.label(Battery.kind, Battery.percent, root.meta.options.symbols)
         color: Battery.state === "critical" ? Theme.critical : Battery.state === "warning" ? Theme.warning : Theme.fg
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSize

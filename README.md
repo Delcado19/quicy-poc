@@ -60,6 +60,11 @@ A module is a folder `modules/<id>/` with a `module.json` and a `Module.qml`.
   and `required property var meta` (the parsed `module.json`). It can `import qs.core` (Theme) and
   `import qs.services`, also when it is loaded from the user directory.
 - Heavy work belongs in `Process`, never in the QML thread.
+- The `battery` module shows a Nerd Font icon: battery with a bolt while charging, plain battery
+  while discharging, a power plug when plugged in without charging (full or held by a charge limit).
+  The icons are options in `modules/battery/module.json` (`options.symbols.charging|discharging|idle`,
+  up to four characters each; invalid values fall back to the default), so a machine without Nerd
+  Fonts can use plain text there without touching the code.
 - Ids match `^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$`; anything else is rejected before a path is built.
 
 ### Activating and overriding
