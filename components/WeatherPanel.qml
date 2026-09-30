@@ -108,6 +108,11 @@ Column {
                 readonly property bool alignRight: kind === "hour" || kind === "temp" || kind === "pct"
                     || (kind === "head" && [0, 2, 4, 5, 6, 7].indexOf(index) >= 0)
 
+                // The cell may be wider than its text (numeric columns have a minimum width).
+                // The text must then sit at the right edge of the cell itself, not just the cell
+                // in its column, or headings and numbers drift apart.
+                horizontalAlignment: alignRight ? Text.AlignRight : Text.AlignLeft
+
                 Layout.columnSpan: modelData.span
                 Layout.alignment: (alignRight ? Qt.AlignRight : Qt.AlignLeft) | Qt.AlignVCenter
                 Layout.topMargin: kind === "dayTitle" && !modelData.first ? Theme.spacing * 2 : 0
