@@ -31,13 +31,13 @@ Read from `~/.local/lib/hyde/color.set.sh` (HyDE, Sep 2026):
   and never creates it. That is why `install.sh` creates `~/.local/state/quicy`.
 - The rendered file is written with `mktemp` + `mv`, i.e. replace-by-rename. The theme watcher in
   `core/Theme.qml` was tested with exactly this write pattern.
-- Colour mapping: `pry1` background, `txt1` foreground, `1xa7` accent, `3xa6` muted, `1xa8` critical,
-  following the existing wayle bridge in `~/.config/hyde/wallbash/scripts`. `warning` is a fixed
-  amber (`#F5A524`) on purpose: wallbash derives the nine accents `xa1`..`xa9` of a primary from that
-  primary's hue, so every palette-derived colour has the wallpaper's hue and, with similar primaries,
-  even the same value (`1xa6` and `3xa6` were both `#C2807A`). A warning must not depend on the
-  wallpaper to stay recognisable. `critical` is still palette-derived (see the note in this file's
-  "Open points").
+- Colour mapping: `pry1` background, `txt1` foreground, `1xa7` accent, `3xa6` muted, following the
+  existing wayle bridge in `~/.config/hyde/wallbash/scripts`. `warning` (amber `#F5A524`) and
+  `critical` (red `#E5484D`) are fixed on purpose: wallbash derives the nine accents `xa1`..`xa9` of
+  a primary from that primary's hue, so every palette-derived colour has the wallpaper's hue and,
+  with similar primaries, even the same value (`1xa6` and `3xa6` were both `#C2807A`). On a blue
+  wallpaper a derived "critical" would be blue. Status colours must not depend on the wallpaper to
+  stay recognisable; the chosen values are readable on dark and light backgrounds.
 
 ## Starting the shell from HyDE
 
@@ -55,10 +55,6 @@ This snippet is **not applied automatically**. It assumes the shell tree is inst
 `~/.local/share/quicy` (copy or link this repository there); the PoC has no installer for that
 part. Back up `config.toml` with `hyde-backup.sh` before editing it, and note that Waybar keeps
 running until the default `bar` entry is replaced.
-
-## Open points
-
-- `critical` (`1xa8`) is a light tint of the wallpaper hue and can look less alarming than `warning`; a fixed red would fix that. Not changed yet.
 
 ## Verified against the live install (2026-09-30)
 
