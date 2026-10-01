@@ -116,23 +116,18 @@ function allIds(m) {
     return out;
 }
 
-function defaultIds(m) {
-    var seen = Object.create(null);
-    var out = [];
-    ZONES.forEach(function (z) {
-        (m["default"][z] || []).forEach(function (id) {
-            if (!seen[id]) { seen[id] = true; out.push(id); }
-        });
-    });
-    return out;
+// Include the default for future monitors as well as every configured override.
+function commonIds(m) {
+    var blocks = [forScreen(m, "")].concat(Object.keys(m.screens).map(function (name) { return forScreen(m, name); }));
+    var ids = blocks.map(function (b) { return ZONES.reduce(function (out, z) { return out.concat(b[z]); }, []); });
+    return ids[0].filter(function (id) { return ids.every(function (list) { return list.indexOf(id) >= 0; }); });
 }
 
 function copyState(s) { return { extra: s.extra.slice(), hidden: s.hidden.slice() }; }
 
 // IPC "load": un-hides an id, and appends it to the right zone of every bar
-// unless the default layout already shows it. `inLayout` refers to the default
-// block only: an id that just one screen override shows still has to be
-// added for the other bars (forScreen skips extras a screen already has).
+// unless every effective layout already shows it. `inLayout` means common to
+// the default and all screen layouts; forScreen skips extras already present.
 function loadId(state, id, inLayout) {
     var s = copyState(state);
     var changed = false;
@@ -148,13 +143,13 @@ function loadId(state, id, inLayout) {
 function unloadId(state, id, inLayout) {
     var s = copyState(state);
     var ei = s.extra.indexOf(id);
-    if (ei >= 0) { s.extra.splice(ei, 1); return { state: s, changed: true }; }
-    if (!inLayout || s.hidden.indexOf(id) >= 0) return { state: s, changed: false };
+    if (ei >= 0) s.extra.splice(ei, 1);
+    if (!inLayout || s.hidden.indexOf(id) >= 0) return { state: s, changed: ei >= 0 };
     s.hidden.push(id);
     return { state: s, changed: true };
 }
 
 if (typeof module !== "undefined") module.exports = {
     parseLayout: parseLayout, mergeLayout: mergeLayout, forScreen: forScreen,
-    allIds: allIds, defaultIds: defaultIds, loadId: loadId, unloadId: unloadId
+    allIds: allIds, commonIds: commonIds, loadId: loadId, unloadId: unloadId
 };

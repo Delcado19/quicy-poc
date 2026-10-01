@@ -107,3 +107,19 @@ test("label: boundaries, rounding and unreadable percentages", () => {
   for (const bad of [NaN, Infinity, undefined, null, "98", {}]) assert.equal(B.label("idle", bad), PLUG + " –", String(bad));
   assert.equal(B.label("nonsense", 50), PLUG + " 50%");
 });
+
+test("battery symbols tolerate shadowed methods, null prototypes and inherited keys", () => {
+  const M = load("core/lib/modules.js");
+  for (const value of [false, null, 0, "oops", {}]) {
+    const parsed = M.parseModuleJson(JSON.stringify({ name: "battery", api: 1,
+      options: { symbols: { hasOwnProperty: value, charging: "+" } } }));
+    assert.deepEqual(parsed.problems, []);
+    assert.equal(B.label("charging", 50, parsed.meta.options.symbols), "+ 50%");
+    assert.equal(B.label("idle", 50, parsed.meta.options.symbols), PLUG + " 50%");
+  }
+  assert.equal(B.symbolFor("charging", Object.assign(Object.create(null), { charging: "+" })), "+");
+  assert.equal(B.symbolFor("charging", Object.create({ charging: "+" })), CHARGING);
+  for (const key of ["__proto__", "constructor", "hasOwnProperty"]) {
+    assert.equal(B.symbolFor(key), PLUG);
+  }
+});

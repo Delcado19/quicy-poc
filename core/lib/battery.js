@@ -27,7 +27,7 @@ function kindFor(charging, discharging) {
 function symbolFor(kind, overrides) {
     var def = DEFAULT_SYMBOLS.hasOwnProperty(kind) ? DEFAULT_SYMBOLS[kind] : DEFAULT_SYMBOLS.idle;
     if (overrides === null || typeof overrides !== "object" || Array.isArray(overrides)) return def;
-    var v = overrides.hasOwnProperty(kind) ? overrides[kind] : undefined;
+    var v = Object.prototype.hasOwnProperty.call(overrides, kind) ? overrides[kind] : undefined;
     if (typeof v !== "string" || v.trim() === "" || Array.from(v).length > 4) return def;
     return v;
 }

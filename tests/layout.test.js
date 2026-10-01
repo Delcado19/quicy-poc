@@ -114,9 +114,9 @@ test("allIds collects default and screen ids uniquely", () => {
   assert.deepEqual(L.allIds(m).sort(), ["backlight", "battery", "weather", "x"]);
 });
 
-test("defaultIds lists only the default block, allIds also the screen overrides", () => {
+test("commonIds lists ids present in every effective layout, allIds includes every configured id", () => {
   const m = L.mergeLayout(parse(SHIPPED), parse({ screens: { "DP-1": { center: ["only-dp"] } } }));
-  assert.deepEqual(L.defaultIds(m).sort(), ["backlight", "battery", "weather"]);
+  assert.deepEqual(L.commonIds(m), ["battery"]);
   assert.ok(L.allIds(m).includes("only-dp"));
 });
 
@@ -157,8 +157,8 @@ test("load of an id that is hidden but not in the layout still shows it", () => 
 
 test("an id that only a screen override shows is added on the other bars, not duplicated", () => {
   const m = L.mergeLayout(parse(SHIPPED), parse({ screens: { "DP-1": { center: ["only-dp"] } } }));
-  const inDefault = L.defaultIds(m).includes("only-dp");
-  const r = L.loadId({ extra: [], hidden: [] }, "only-dp", inDefault);
+  const everywhere = L.commonIds(m).includes("only-dp");
+  const r = L.loadId({ extra: [], hidden: [] }, "only-dp", everywhere);
   assert.equal(r.changed, true);
   assert.ok(L.forScreen(m, "eDP-1", r.state.extra, r.state.hidden).right.includes("only-dp"));
   const dp = L.forScreen(m, "DP-1", r.state.extra, r.state.hidden);
@@ -170,4 +170,56 @@ test("state transitions do not mutate their input", () => {
   L.loadId(s, "b", false);
   L.unloadId(s, "a", false);
   assert.deepEqual(s, { extra: ["a"], hidden: [] });
+});
+
+for (const [name, layout] of Object.entries({
+  "screen-only": { default: { right: [] }, screens: { "DP-1": { center: ["clock"] } } },
+  "excluded by override": { default: { right: ["clock"] }, screens: { "DP-1": { right: [] } } },
+  "inherited": { default: { left: ["clock"] }, screens: { "DP-1": { right: [] } } },
+  "moved between zones": { default: { right: ["clock"] }, screens: { "DP-1": { right: [], left: ["clock"] } } },
+  "absent": { default: {}, screens: { "DP-1": {} } }
+})) {
+  test(`IPC round trip across monitors: ${name}`, () => {
+    const m = L.mergeLayout(parse(layout), parse({}));
+    const before = JSON.stringify(m);
+    const everywhere = L.commonIds(m).includes("clock");
+    const anywhere = L.allIds(m).includes("clock");
+    let state = { extra: [], hidden: [] };
+    for (let cycle = 0; cycle < 2; cycle++) {
+      const old = JSON.stringify(state);
+      let r = L.loadId(state, "clock", everywhere);
+      assert.equal(JSON.stringify(state), old);
+      assert.equal(r.changed, cycle > 0 || !everywhere);
+      state = r.state;
+      for (const screen of ["DP-1", "new-monitor", ""]) {
+        const b = L.forScreen(m, screen, state.extra, state.hidden);
+        assert.equal([...b.left, ...b.center, ...b.right].filter(id => id === "clock").length, 1);
+      }
+      const dp = L.forScreen(m, "DP-1", state.extra, state.hidden);
+      const original = L.forScreen(m, "DP-1");
+      for (const zone of ["left", "center", "right"]) {
+        if (original[zone].includes("clock")) assert.ok(dp[zone].includes("clock"));
+      }
+      assert.equal(L.loadId(state, "clock", everywhere).changed, false);
+      const loaded = JSON.stringify(state);
+      r = L.unloadId(state, "clock", anywhere);
+      assert.equal(r.changed, true);
+      assert.equal(JSON.stringify(state), loaded);
+      state = r.state;
+      for (const screen of ["DP-1", "new-monitor", ""]) {
+        const b = L.forScreen(m, screen, state.extra, state.hidden);
+        assert.equal([...b.left, ...b.center, ...b.right].includes("clock"), false);
+      }
+      assert.equal(L.unloadId(state, "clock", anywhere).changed, false);
+    }
+    assert.equal(JSON.stringify(m), before);
+    assert.deepEqual(L.forScreen(m, "DP-1", [], []), L.forScreen(m, "DP-1"));
+  });
+}
+
+test("commonIds handles empty layouts, inherited zones and prototype-like monitor names", () => {
+  assert.deepEqual(L.commonIds(L.mergeLayout(parse({}), parse({}))), []);
+  const m = L.mergeLayout(parse({ default: { left: ["a", "a"], right: ["b"] } }),
+    parse('{"screens":{"__proto__":{"right":[]},"DP-1":{"center":["b"]}}}'));
+  assert.deepEqual(L.commonIds(m), ["a"]);
 });

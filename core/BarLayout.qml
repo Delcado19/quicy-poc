@@ -53,7 +53,7 @@ Singleton {
     }
 
     function load(id) {
-        var r = L.loadId(state, id, L.defaultIds(merged).indexOf(id) >= 0);
+        var r = L.loadId(state, id, L.commonIds(merged).indexOf(id) >= 0);
         if (r.changed) { state = r.state; revision++; }
         return r.changed;
     }

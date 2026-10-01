@@ -6,8 +6,8 @@ It is candidate content for the QuiCy repo, not a competing product: names and c
 and are meant to be aligned with QuiCy once its layout is public.
 
 It answers, early and cheaply, whether the module/override architecture works and whether the
-Waybar-style pieces (native types, plain files, HyDE scripts) fit into it. It is a bar only; no
-notification server, lockscreen, launcher, tooltips or popups.
+Waybar-style pieces (native types, plain files, HyDE scripts) fit into it. It is a bar with tooltips and popovers; no
+notification server, lockscreen or launcher.
 
 ## Requirements
 
@@ -129,6 +129,14 @@ reported and ignored, the shipped layout stays in effect.
 | `theme reload` / `layout reload` | re-read files (`layout reload` also clears load/unload state) |
 | `shell reload` | reload the whole config; needed after editing a module's QML |
 
+Loading an id ensures it appears once on every bar, including monitors whose layout
+explicitly excludes it. Existing entries keep their zone; missing entries are appended
+to the right. This also applies to monitors connected later. Unloading hides the id
+everywhere, even when it is both IPC-loaded and present in a monitor layout.
+Repeated calls report "no change" once the requested state is established. The default
+and all configured monitor layouts participate in this decision, including disconnected
+monitors. `layout reload` restores the configured layout and clears these IPC overrides.
+
 ## Theme
 
 `core/Theme.qml` reads a flat JSON file (colours are `#RRGGBB` or `#RRGGBBAA` in CSS order, like Waybar and wallbash; the parser converts the alpha byte for QML): six colours (`bg fg accent muted warning critical`), `font.family`,
@@ -152,7 +160,9 @@ sh tests/run.sh
 ```
 
 Node tests cover the parsing/merge logic and the backup/install scripts, including malformed and
-missing input and boundary values. The QML wiring is checked for syntax only; behaviour was
+missing input and boundary values. Regression cases cover multi-monitor load/unload
+round trips, empty and inherited zones, repeated calls, future monitor names, and battery
+symbol options with shadowed object methods or inherited keys. The QML wiring is checked for syntax only; behaviour was
 verified live on Hyprland (see the plan and spec for the scenarios).
 
 ## Known limitations
